@@ -30,6 +30,8 @@ pub trait Object: Display {
     fn class(&self) -> Class;
     fn as_string(&self) -> String;
     fn as_number(&self) -> f32;
+    fn get_field(&self, field: String) -> &dyn Object;
+    fn set_field(&mut self, field: String, value: Box<dyn Object>);
 }
 
 pub struct InputSocket {
