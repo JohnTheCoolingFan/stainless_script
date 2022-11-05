@@ -1,6 +1,7 @@
 use std::{fmt::{Display, Debug}, collections::HashMap, rc::Rc};
 use serde::{Serialize, Deserialize};
 
+/// Used to index items across programs/packages. Built with executor upon loading programs.
 pub struct Module {
     pub items: HashMap<String, ModuleItem>
 }
