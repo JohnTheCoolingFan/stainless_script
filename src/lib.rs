@@ -58,7 +58,6 @@ pub type ModulePath = (Vec<String>, String);
 pub trait Node: Debug {
     fn execute(&self, context: &mut ExecutionContext) -> usize;
     fn class(&self) -> Class;
-    fn id(&self) -> NodeId;
     fn variants(&self) -> Vec<&str>;
     fn current_variant(&self) -> &str;
     fn set_variant(&mut self, variant: &str);
