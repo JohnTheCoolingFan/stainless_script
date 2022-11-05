@@ -48,7 +48,7 @@ pub struct ExecutionContext {
 }
 
 pub type NodeId = usize;
-pub type ProgramId = usize;
+pub type ProgramId = ModulePath;
 pub type ExternalNodeId = (ProgramId, NodeId);
 pub type NodeBranchId = (NodeId, usize);
 pub type ConnectionId = usize;
@@ -74,6 +74,7 @@ pub struct ProgramCollection {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Program {
     pub nodes: HashMap<NodeId, NodeInfo>,
+    pub classes: HashMap<String, ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
     pub connections: HashMap<ConnectionId, Connection>
 }
@@ -88,4 +89,10 @@ pub struct NodeInfo {
 pub struct Connection {
     pub input: InputSocketId,
     pub output: OutputSocketId
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProtoClass {
+    name: String,
+    nodes: Vec<NodeId>
 }
