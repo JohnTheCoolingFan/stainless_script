@@ -28,10 +28,10 @@ impl Eq for Class {}
 
 pub trait Object: Display {
     fn class(&self) -> Class;
-    fn as_string(&self) -> String;
+    fn as_string(&self) -> &str;
     fn as_number(&self) -> f32;
-    fn get_field(&self, field: String) -> &dyn Object;
-    fn set_field(&mut self, field: String, value: Box<dyn Object>);
+    fn get_field(&self, field: &str) -> &dyn Object;
+    fn set_field(&mut self, field: &str, value: Box<dyn Object>);
 }
 
 pub struct InputSocket {
