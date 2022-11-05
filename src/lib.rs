@@ -49,7 +49,7 @@ pub struct ExecutionContext {
 
 pub type NodeId = usize;
 pub type ProgramId = ModulePath;
-pub type ExternalNodeId = (ProgramId, NodeId);
+pub type AbsoluteNodeId = (ProgramId, NodeId);
 pub type NodeBranchId = (NodeId, usize);
 pub type ConnectionId = usize;
 pub type InputSocketId = (NodeId, usize);
