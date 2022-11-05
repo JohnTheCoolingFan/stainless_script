@@ -65,6 +65,8 @@ pub trait Node: Debug {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Program {
+    #[serde(skip)]
+    pub id: ProgramId,
     pub nodes: HashMap<NodeId, NodeInfo>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
     pub connections: HashMap<ConnectionId, Connection>
