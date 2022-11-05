@@ -28,6 +28,8 @@ impl Eq for Class {}
 
 pub trait Object: Display {
     fn class(&self) -> Class;
+    fn as_string(&self) -> String;
+    fn as_number(&self) -> f32;
 }
 
 pub struct InputSocket {
