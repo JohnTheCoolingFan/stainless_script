@@ -63,6 +63,10 @@ pub trait Node: Debug {
     fn branches(&self) -> usize;
 }
 
+pub struct ProgramCollection {
+    pub programs: HashMap<ProgramId, Program>
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Program {
     pub nodes: HashMap<NodeId, NodeInfo>,
