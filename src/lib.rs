@@ -75,6 +75,18 @@ pub struct ExecutionContext<'a> {
     parent: Option<&'a ExecutionContext<'a>>
 }
 
+impl<'a> ExecutionContext<'a> {
+    fn new(parent: Option<&'a ExecutionContext<'a>>) -> ExecutionContext<'a> {
+        Self { parent }
+    }
+
+    /// Redirect execution to a subroutine. Returns whatever end node receives.
+    fn execute_subroutine(&'a self, start: AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
+        let sub_context = Self::new(Some(self));
+        todo!()
+    }
+}
+
 /// ID of a node
 pub type NodeId = usize;
 /// ID of a program, constructed by an executor
