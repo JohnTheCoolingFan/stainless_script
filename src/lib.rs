@@ -168,6 +168,6 @@ pub struct Connection {
 /// Description of a class stored in the program
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProtoClass {
-    name: String,
-    nodes: Vec<NodeId>,
+    pub name: String,
+    pub nodes: Vec<NodeId>,
 }
