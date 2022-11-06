@@ -1,4 +1,4 @@
-use std::{fmt::{Display, Debug}, collections::HashMap, rc::Rc};
+use std::{fmt::{Display, Debug}, collections::HashMap, rc::Rc, str::FromStr, error::Error};
 use serde::{Serialize, Deserialize};
 
 /// Used to index items across programs/packages. Built with executor upon loading programs.
@@ -30,9 +30,20 @@ impl PartialEq for Class {
 
 impl Eq for Class {}
 
+pub trait ObjectFromStr {
+    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>> where Self: Sized;
+}
+
+impl<T: FromStr> ObjectFromStr for T where T::Err: 'static + Error + Send + Sync {
+    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>> where Self: Sized,
+    {
+        <Self as FromStr>::from_str(s).map_err(Into::into)
+    }
+}
+
 /// The object of a data type. Data type is derived from the object's class. Methods specified here
 /// are for use in nodes mostly.
-pub trait Object: Display {
+pub trait Object: Display + ObjectFromStr {
     fn class(&self) -> Class;
     /// Since Object requires Display, this has little use. Left for consistency with as_number and
     /// other methods
