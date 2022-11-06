@@ -7,6 +7,7 @@ pub struct Module {
 }
 
 pub enum ModuleItem {
+    /// Not implemented yet, not parsed from the program file
     Constant(Rc<dyn Object>),
     Class(Class),
     Module(Module)
@@ -110,7 +111,8 @@ pub struct Program {
     pub nodes: HashMap<NodeId, NodeInfo>,
     pub classes: HashMap<String, ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
-    pub connections: HashMap<ConnectionId, Connection>
+    pub connections: HashMap<ConnectionId, Connection>,
+    pub const_inputs: HashMap<InputSocketId, String>
 }
 
 /// Information about a node stored in the program
