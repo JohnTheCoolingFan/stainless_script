@@ -1,16 +1,22 @@
-use std::{fmt::{Display, Debug}, collections::HashMap, rc::Rc, str::FromStr, error::Error};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::HashMap,
+    error::Error,
+    fmt::{Debug, Display},
+    rc::Rc,
+    str::FromStr,
+};
 
 /// Used to index items across programs/packages. Built with executor upon loading programs.
 pub struct Module {
-    pub items: HashMap<String, ModuleItem>
+    pub items: HashMap<String, ModuleItem>,
 }
 
 pub enum ModuleItem {
     /// Not implemented yet, not parsed from the program file
     Constant(Rc<dyn Object>),
     Class(Class),
-    Module(Module)
+    Module(Module),
 }
 
 /// Describes a data type. Provides default node that is usually a constructor or some other node.
@@ -19,7 +25,7 @@ pub enum ModuleItem {
 pub struct Class {
     pub name: String,
     /// Default node to be placed when selecting a class to put. Usually a constructor method.
-    pub default_node: Rc<dyn Node>
+    pub default_node: Rc<dyn Node>,
 }
 
 impl PartialEq for Class {
@@ -31,11 +37,18 @@ impl PartialEq for Class {
 impl Eq for Class {}
 
 pub trait ObjectFromStr {
-    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>> where Self: Sized;
+    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>>
+    where
+        Self: Sized;
 }
 
-impl<T: FromStr> ObjectFromStr for T where T::Err: 'static + Error + Send + Sync {
-    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>> where Self: Sized,
+impl<T: FromStr> ObjectFromStr for T
+where
+    T::Err: 'static + Error + Send + Sync,
+{
+    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>>
+    where
+        Self: Sized,
     {
         <Self as FromStr>::from_str(s).map_err(Into::into)
     }
@@ -61,18 +74,18 @@ pub trait Object: Display + ObjectFromStr {
 
 /// Input of a node.
 pub struct InputSocket {
-    pub class: Class
+    pub class: Class,
 }
 
 /// Output of a node
 pub struct OutputSocket {
-    pub class: Class
+    pub class: Class,
 }
 
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
 /// through this context.
 pub struct ExecutionContext<'a> {
-    parent: Option<&'a ExecutionContext<'a>>
+    parent: Option<&'a ExecutionContext<'a>>,
 }
 
 impl<'a> ExecutionContext<'a> {
@@ -125,7 +138,7 @@ pub trait Node: Debug {
 
 /// Collection of programs loaded into an executor
 pub struct ProgramCollection {
-    pub programs: HashMap<ProgramId, Program>
+    pub programs: HashMap<ProgramId, Program>,
 }
 
 /// A program that contains nodes, classes, constant objects, etc.
@@ -135,14 +148,14 @@ pub struct Program {
     pub classes: HashMap<String, ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
     pub connections: HashMap<ConnectionId, Connection>,
-    pub const_inputs: HashMap<InputSocketId, String>
+    pub const_inputs: HashMap<InputSocketId, String>,
 }
 
 /// Information about a node stored in the program
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NodeInfo {
     pub class: ModulePath,
-    pub variant: String
+    pub variant: String,
 }
 
 /// Connection of a output to an input
@@ -156,5 +169,5 @@ pub struct Connection {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProtoClass {
     name: String,
-    nodes: Vec<NodeId>
+    nodes: Vec<NodeId>,
 }
