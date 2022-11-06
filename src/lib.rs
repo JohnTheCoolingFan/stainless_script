@@ -29,7 +29,9 @@ impl Eq for Class {}
 
 pub trait Object: Display {
     fn class(&self) -> Class;
-    fn as_string(&self) -> &str;
+    fn as_string(&self) -> String {
+        self.to_string()
+    }
     fn as_number(&self) -> f32;
     fn get_field(&self, field: &str) -> &Rc<dyn Object>;
     fn set_field(&mut self, field: &str, value: &Rc<dyn Object>);
