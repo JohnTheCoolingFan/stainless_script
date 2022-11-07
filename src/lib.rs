@@ -104,6 +104,11 @@ impl<'a> ExecutionContext<'a> {
         todo!()
     }
 
+    /// Finish executing subroutine, return to caller.
+    pub fn finish_subroutine(&'a self, return_values: Vec<Rc<dyn Object>>) {
+        todo!()
+    }
+
     pub fn get_inputs(&'a self) -> Vec<Rc<dyn Object>> {
         todo!()
     }
