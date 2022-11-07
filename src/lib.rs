@@ -68,7 +68,7 @@ pub trait Object: Display + ObjectFromStr {
         self.to_string()
     }
     /// Convert to number
-    fn as_number(&self) -> f32;
+    fn as_number(&self) -> f64;
     /// Convert to boolean
     fn as_bool(&self) -> bool;
     /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields

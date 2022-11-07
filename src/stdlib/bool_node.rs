@@ -17,7 +17,7 @@ impl Object for bool {
         bool_class()
     }
 
-    fn as_number(&self) -> f32 {
+    fn as_number(&self) -> f64 {
         if *self {
             1.0
         } else {
