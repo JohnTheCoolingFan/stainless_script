@@ -78,6 +78,7 @@ pub trait Object: Display + ObjectFromStr {
 }
 
 /// Input of a node.
+#[derive(Debug, Clone)]
 pub struct InputSocket {
     /// This is merely a type suggestion used to hint what type is expected. Can be used by IDEs to
     /// force only certain type in a connection, requiring to do a proper conversion. 
@@ -85,6 +86,7 @@ pub struct InputSocket {
 }
 
 /// Output of a node
+#[derive(Debug, Clone)]
 pub struct OutputSocket {
     pub class: Class,
 }
