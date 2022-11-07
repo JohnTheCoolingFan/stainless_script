@@ -1,5 +1,5 @@
 use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
-use std::{fmt::Display, num::ParseIntError, rc::Rc, str::FromStr, borrow::Cow};
+use std::{borrow::Cow, fmt::Display, num::ParseIntError, rc::Rc, str::FromStr};
 use thiserror::Error;
 
 pub fn nop_node_class() -> Class {
@@ -33,7 +33,10 @@ pub fn any_class() -> Class {
 pub fn print_class() -> Class {
     Class {
         name: "print".into(),
-        default_node: Rc::new(Print(PrintVariant { ln: true, amount: 1 })) as Rc<dyn Node>
+        default_node: Rc::new(Print(PrintVariant {
+            ln: true,
+            amount: 1,
+        })) as Rc<dyn Node>,
     }
 }
 
@@ -251,7 +254,12 @@ pub struct Print(PrintVariant);
 
 impl Node for Print {
     fn execute(&self, context: &mut ExecutionContext) -> usize {
-        let to_print: String = context.get_inputs().iter().map(ToString::to_string).collect::<Vec<String>>().join(" ");
+        let to_print: String = context
+            .get_inputs()
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<String>>()
+            .join(" ");
         if self.0.ln {
             println!("{}", to_print);
         } else {
@@ -265,7 +273,11 @@ impl Node for Print {
     }
 
     fn variants(&self) -> Vec<Cow<'_, str>> {
-        vec!["print".into(), "println".into(), Cow::Owned(self.0.to_string())]
+        vec![
+            "print".into(),
+            "println".into(),
+            Cow::Owned(self.0.to_string()),
+        ]
     }
 
     fn current_variant(&self) -> Cow<'_, str> {
@@ -277,7 +289,7 @@ impl Node for Print {
     }
 
     fn inputs(&self) -> Vec<InputSocket> {
-        vec![InputSocket { class: any_class()}; self.0.amount]
+        vec![InputSocket { class: any_class() }; self.0.amount]
     }
 
     fn outputs(&self) -> Vec<OutputSocket> {
