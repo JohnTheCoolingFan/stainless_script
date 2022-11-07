@@ -4,7 +4,7 @@ use std::{
     error::Error,
     fmt::{Debug, Display},
     rc::Rc,
-    str::FromStr,
+    str::FromStr, borrow::Cow,
 };
 
 pub mod stdlib;
@@ -145,9 +145,9 @@ pub trait Node: Debug {
     /// The class of the node
     fn class(&self) -> Class;
     /// Variants of a node. Internally can be anythingg that can be converted to string
-    fn variants(&self) -> Vec<&str>;
+    fn variants(&self) -> Vec<Cow<'_, str>>;
     /// Current selected variant of the node
-    fn current_variant(&self) -> &str;
+    fn current_variant(&self) -> Cow<'_, str>;
     /// Set a specific variant of a node
     fn set_variant(&mut self, variant: &str);
     /// Get information about node's inputs

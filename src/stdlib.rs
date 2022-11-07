@@ -1,5 +1,5 @@
 use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
-use std::{fmt::Display, num::ParseIntError, rc::Rc, str::FromStr, ops::Deref};
+use std::{fmt::Display, num::ParseIntError, rc::Rc, str::FromStr, borrow::Cow};
 use thiserror::Error;
 
 pub fn nop_node_class() -> Class {
@@ -53,12 +53,12 @@ impl Node for NopNode {
         }
     }
 
-    fn variants(&self) -> Vec<&str> {
-        vec!["nop"]
+    fn variants(&self) -> Vec<Cow<'_, str>> {
+        vec!["nop".into()]
     }
 
-    fn current_variant(&self) -> &str {
-        "nop"
+    fn current_variant(&self) -> Cow<'_, str> {
+        "nop".into()
     }
 
     fn set_variant(&mut self, _variant: &str) {}
@@ -116,12 +116,12 @@ impl Node for BoolConstructor {
         bool_class()
     }
 
-    fn variants(&self) -> Vec<&str> {
-        vec!["from-object"]
+    fn variants(&self) -> Vec<Cow<'_, str>> {
+        vec!["from-object".into()]
     }
 
-    fn current_variant(&self) -> &str {
-        "from-object"
+    fn current_variant(&self) -> Cow<'_, str> {
+        "from-object".into()
     }
 
     fn set_variant(&mut self, _variant: &str) {}
@@ -157,12 +157,12 @@ impl Node for IfNode {
         }
     }
 
-    fn variants(&self) -> Vec<&str> {
-        vec!["if"]
+    fn variants(&self) -> Vec<Cow<'_, str>> {
+        vec!["if".into()]
     }
 
-    fn current_variant(&self) -> &str {
-        "if"
+    fn current_variant(&self) -> Cow<'_, str> {
+        "if".into()
     }
 
     fn set_variant(&mut self, _variant: &str) {}
@@ -264,12 +264,12 @@ impl Node for Print {
         print_class()
     }
 
-    fn variants(&self) -> Vec<&str> {
-        vec!["print", "println", Box::leak(self.0.to_string().into_boxed_str())]
+    fn variants(&self) -> Vec<Cow<'_, str>> {
+        vec!["print".into(), "println".into(), Cow::Owned(self.0.to_string())]
     }
 
-    fn current_variant(&self) -> &str {
-        Box::leak(self.0.to_string().into_boxed_str())
+    fn current_variant(&self) -> Cow<'_, str> {
+        self.0.to_string().into()
     }
 
     fn set_variant(&mut self, variant: &str) {
