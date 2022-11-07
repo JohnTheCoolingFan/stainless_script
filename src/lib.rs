@@ -113,7 +113,7 @@ impl<'a> ExecutionContext<'a> {
         todo!()
     }
 
-    pub fn set_output(&'a mut self, values: Vec<Rc<dyn Object>>) {
+    pub fn set_outputs(&'a mut self, values: Vec<Rc<dyn Object>>) {
         todo!()
     }
 }
