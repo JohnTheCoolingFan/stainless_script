@@ -81,7 +81,7 @@ pub trait Object: Display + ObjectFromStr {
 #[derive(Debug, Clone)]
 pub struct InputSocket {
     /// This is merely a type suggestion used to hint what type is expected. Can be used by IDEs to
-    /// force only certain type in a connection, requiring to do a proper conversion. 
+    /// force only certain type in a connection, requiring to do a proper conversion.
     pub class: Class,
 }
 
@@ -155,7 +155,9 @@ pub trait Node: Debug {
     /// Get information about node's outputs
     fn outputs(&self) -> Vec<OutputSocket>;
     /// How many branches this node has
-    fn branches(&self) -> usize;
+    fn branches(&self) -> usize {
+        1
+    }
 }
 
 /// Collection of programs loaded into an executor
