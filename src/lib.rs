@@ -105,15 +105,15 @@ impl<'a> ExecutionContext<'a> {
     }
 
     /// Finish executing subroutine, return to caller.
-    pub fn finish_subroutine(&'a self, return_values: Vec<Rc<dyn Object>>) {
+    pub fn finish_subroutine(&self, return_values: Vec<Rc<dyn Object>>) {
         todo!()
     }
 
-    pub fn get_inputs(&'a self) -> Vec<Rc<dyn Object>> {
+    pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
         todo!()
     }
 
-    pub fn set_outputs(&'a mut self, values: Vec<Rc<dyn Object>>) {
+    pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
         todo!()
     }
 }
