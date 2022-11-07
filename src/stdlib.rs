@@ -55,11 +55,11 @@ impl Node for NopNode {
 
     fn set_variant(&mut self, _variant: &str) {}
 
-    fn inputs(&self) -> Vec<crate::InputSocket> {
+    fn inputs(&self) -> Vec<InputSocket> {
         vec![]
     }
 
-    fn outputs(&self) -> Vec<crate::OutputSocket> {
+    fn outputs(&self) -> Vec<OutputSocket> {
         vec![]
     }
 
@@ -118,13 +118,13 @@ impl Node for BoolConstructor {
 
     fn set_variant(&mut self, _variant: &str) {}
 
-    fn inputs(&self) -> Vec<crate::InputSocket> {
+    fn inputs(&self) -> Vec<InputSocket> {
         vec![InputSocket {
             class: any_class()
         }]
     }
 
-    fn outputs(&self) -> Vec<crate::OutputSocket> {
+    fn outputs(&self) -> Vec<OutputSocket> {
         vec![OutputSocket {
             class: bool_class(),
         }]
@@ -161,13 +161,13 @@ impl Node for IfNode {
 
     fn set_variant(&mut self, _variant: &str) {}
 
-    fn inputs(&self) -> Vec<crate::InputSocket> {
+    fn inputs(&self) -> Vec<InputSocket> {
         vec![InputSocket {
             class: bool_class()
         }]
     }
 
-    fn outputs(&self) -> Vec<crate::OutputSocket> {
+    fn outputs(&self) -> Vec<OutputSocket> {
         vec![]
     }
 
