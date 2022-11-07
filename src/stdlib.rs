@@ -1,6 +1,13 @@
 use crate::{Class, Node};
 use std::rc::Rc;
 
+pub fn nop_node_class() -> Class {
+    Class {
+        name: "nop".into(),
+        default_node: Rc::new(NopNode) as Rc<dyn Node>,
+    }
+}
+
 /// Does nothing. Literal NOP. The easiest node to implement
 #[derive(Debug, Clone)]
 pub struct NopNode;
