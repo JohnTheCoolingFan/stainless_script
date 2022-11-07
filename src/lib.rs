@@ -7,6 +7,8 @@ use std::{
     str::FromStr,
 };
 
+pub mod stdlib;
+
 /// Used to index items across programs/packages. Built with executor upon loading programs.
 pub struct Module {
     pub items: HashMap<String, ModuleItem>,
