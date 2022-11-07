@@ -60,13 +60,16 @@ where
 /// are for use in nodes mostly.
 pub trait Object: Display + ObjectFromStr {
     fn class(&self) -> Class;
-    /// Since Object requires Display, this has little use. Left for consistency with as_number and
-    /// other methods
+    /// Since Object requires Display, this has little use and is implemented  through ToString,
+    /// which is implemented for all types implementing Display. Left for consistency with 
+    /// as_number and other methods
     fn as_string(&self) -> String {
         self.to_string()
     }
     /// Convert to number
     fn as_number(&self) -> f32;
+    /// Convert to boolean
+    fn as_bool(&self) ->  bool;
     /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields
     fn get_field(&self, field: &str) -> &Rc<dyn Object>;
     /// Suggested implementation: use `String::from` to convert `&str` to `String` and use that as
