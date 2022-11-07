@@ -68,8 +68,4 @@ impl Node for BoolConstructor {
             class: bool_class(),
         }]
     }
-
-    fn branches(&self) -> usize {
-        1
-    }
 }

@@ -123,8 +123,4 @@ impl Node for Print {
     fn outputs(&self) -> Vec<OutputSocket> {
         vec![]
     }
-
-    fn branches(&self) -> usize {
-        1
-    }
 }
