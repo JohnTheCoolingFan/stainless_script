@@ -104,7 +104,7 @@ impl<'a> ExecutionContext<'a> {
     }
 
     /// Redirect execution to a subroutine. Returns whatever end node receives.
-    pub fn execute_subroutine(&'a self, start: AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
+    pub fn execute_subroutine(&'a self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) -> Vec<Rc<dyn Object>> {
         let sub_context = Self::new(Some(self));
         todo!()
     }
