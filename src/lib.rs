@@ -94,18 +94,15 @@ pub struct OutputSocket {
 
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
 /// through this context.
-pub struct ExecutionContext<'a> {
-    parent: Option<&'a ExecutionContext<'a>>,
-}
+pub struct ExecutionContext {}
 
-impl<'a> ExecutionContext<'a> {
-    pub fn new(parent: Option<&'a ExecutionContext<'a>>) -> ExecutionContext<'a> {
-        Self { parent }
-    }
-
+impl ExecutionContext {
     /// Redirect execution to a subroutine. Returns whatever end node receives.
-    pub fn execute_subroutine(&'a self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) -> Vec<Rc<dyn Object>> {
-        let sub_context = Self::new(Some(self));
+    pub fn execute_subroutine(
+        &self,
+        start: AbsoluteNodeId,
+        input_values: Vec<Rc<dyn Object>>,
+    ) -> Vec<Rc<dyn Object>> {
         todo!()
     }
 
