@@ -61,7 +61,7 @@ where
 pub trait Object: Display + ObjectFromStr {
     fn class(&self) -> Class;
     /// Since Object requires Display, this has little use and is implemented  through ToString,
-    /// which is implemented for all types implementing Display. Left for consistency with 
+    /// which is implemented for all types implementing Display. Left for consistency with
     /// as_number and other methods
     fn as_string(&self) -> String {
         self.to_string()
@@ -69,7 +69,7 @@ pub trait Object: Display + ObjectFromStr {
     /// Convert to number
     fn as_number(&self) -> f32;
     /// Convert to boolean
-    fn as_bool(&self) ->  bool;
+    fn as_bool(&self) -> bool;
     /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields
     fn get_field(&self, field: &str) -> &Rc<dyn Object>;
     /// Suggested implementation: use `String::from` to convert `&str` to `String` and use that as
@@ -94,13 +94,21 @@ pub struct ExecutionContext<'a> {
 }
 
 impl<'a> ExecutionContext<'a> {
-    fn new(parent: Option<&'a ExecutionContext<'a>>) -> ExecutionContext<'a> {
+    pub fn new(parent: Option<&'a ExecutionContext<'a>>) -> ExecutionContext<'a> {
         Self { parent }
     }
 
     /// Redirect execution to a subroutine. Returns whatever end node receives.
-    fn execute_subroutine(&'a self, start: AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
+    pub fn execute_subroutine(&'a self, start: AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
         let sub_context = Self::new(Some(self));
+        todo!()
+    }
+
+    pub fn get_inputs(&'a self) -> Vec<Rc<dyn Object>> {
+        todo!()
+    }
+
+    pub fn set_output(&'a mut self, values: Vec<Rc<dyn Object>>) {
         todo!()
     }
 }
