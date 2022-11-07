@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::{
+    borrow::Cow,
     collections::HashMap,
     error::Error,
     fmt::{Debug, Display},
     rc::Rc,
-    str::FromStr, borrow::Cow,
+    str::FromStr,
 };
 
 pub mod stdlib;
