@@ -5,12 +5,12 @@ use std::{borrow::Cow, rc::Rc};
 pub fn bool_class() -> Class {
     Class {
         name: "bool".into(),
-        default_node: Rc::new(BoolConstructor) as Rc<dyn Node>,
+        default_node: Rc::new(BoolNode) as Rc<dyn Node>,
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct BoolConstructor;
+pub struct BoolNode;
 
 impl Object for bool {
     fn class(&self) -> Class {
@@ -38,7 +38,7 @@ impl Object for bool {
     }
 }
 
-impl Node for BoolConstructor {
+impl Node for BoolNode {
     fn execute(&self, context: &mut ExecutionContext) -> u32 {
         let cond = context.get_inputs()[0].as_bool();
         context.set_outputs(vec![Rc::new(cond) as Rc<dyn Object>]);
