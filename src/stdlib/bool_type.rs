@@ -28,14 +28,6 @@ impl Object for bool {
     fn as_bool(&self) -> bool {
         *self
     }
-
-    fn get_field(&self, _field: &str) -> &Rc<dyn Object> {
-        unimplemented!()
-    }
-
-    fn set_field(&mut self, _field: &str, _value: &Rc<dyn Object>) {
-        unimplemented!()
-    }
 }
 
 impl Node for BoolNode {

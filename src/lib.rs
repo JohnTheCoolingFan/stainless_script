@@ -72,11 +72,17 @@ pub trait Object: Display + Debug + ObjectFromStr {
     fn as_number(&self) -> f64;
     /// Convert to boolean
     fn as_bool(&self) -> bool;
-    /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields
-    fn get_field(&self, field: &str) -> &Rc<dyn Object>;
+    /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields.
+    /// Default implementation is `unimplemented!()` because most types don't have fields.
+    fn get_field(&self, field: Rc<dyn Object>) -> Rc<dyn Object> {
+        unimplemented!()
+    }
     /// Suggested implementation: use `String::from` to convert `&str` to `String` and use that as
-    /// insertion key.
-    fn set_field(&mut self, field: &str, value: &Rc<dyn Object>);
+    /// insertion key. Default implementation is `unimplemented!()` because most types don't have
+    /// fields.
+    fn set_field(&mut self, field: Rc<dyn Object>, value: Rc<dyn Object>) {
+        unimplemented!()
+    }
 }
 
 /// Input of a node.

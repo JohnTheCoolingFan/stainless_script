@@ -22,14 +22,6 @@ impl Object for f64 {
     fn as_bool(&self) -> bool {
         *self != 0.0
     }
-
-    fn get_field(&self, _field: &str) -> &std::rc::Rc<dyn Object> {
-        unimplemented!()
-    }
-
-    fn set_field(&mut self, _field: &str, _valuee: &std::rc::Rc<dyn Object>) {
-        unimplemented!()
-    }
 }
 
 #[derive(Debug, Clone)]

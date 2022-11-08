@@ -21,14 +21,6 @@ impl Object for String {
     fn as_bool(&self) -> bool {
         !self.is_empty()
     }
-
-    fn get_field(&self, _field: &str) -> &std::rc::Rc<dyn Object> {
-        unimplemented!()
-    }
-
-    fn set_field(&mut self, _field: &str, _value: &std::rc::Rc<dyn Object>) {
-        unimplemented!()
-    }
 }
 
 #[derive(Debug, Clone)]

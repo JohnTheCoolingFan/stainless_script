@@ -38,12 +38,4 @@ impl Object for AnyType {
     fn as_bool(&self) -> bool {
         !self.0.is_empty()
     }
-
-    fn get_field(&self, field: &str) -> &Rc<dyn Object> {
-        unimplemented!()
-    }
-
-    fn set_field(&mut self, field: &str, value: &Rc<dyn Object>) {
-        unimplemented!()
-    }
 }
