@@ -290,6 +290,10 @@ pub trait Node: Debug {
     fn current_variant(&self) -> Cow<'_, str>;
     /// Set a specific variant of a node
     fn set_variant(&mut self, variant: &str);
+    /// Whether variation can be set as a custom string (not listed in `variants`) or not
+    fn accepts_arbitrary_variants(&self) -> bool {
+        false
+    }
     /// Get information about node's inputs
     fn inputs(&self) -> Vec<InputSocket>;
     /// Get information about node's outputs

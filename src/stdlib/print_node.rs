@@ -116,6 +116,10 @@ impl Node for Print {
         self.0 = variant.parse().unwrap()
     }
 
+    fn accepts_arbitrary_variants(&self) -> bool {
+        true
+    }
+
     fn inputs(&self) -> Vec<InputSocket> {
         vec![InputSocket { class: any_class() }; self.0.amount as usize]
     }
