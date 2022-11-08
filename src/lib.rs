@@ -200,6 +200,7 @@ pub struct ProgramCollection {
 /// A program that contains nodes, classes, constant objects, etc.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Program {
+    pub imports: Vec<String>,
     pub nodes: HashMap<NodeId, NodeInfo>,
     pub classes: HashMap<String, ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
