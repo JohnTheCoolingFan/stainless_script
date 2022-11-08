@@ -116,7 +116,8 @@ impl Executor {
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.node_outputs.insert(self.current_node().clone(), values);
+        self.node_outputs
+            .insert(self.current_node().clone(), values);
     }
 
     fn current_node(&self) -> &AbsoluteNodeId {
@@ -141,13 +142,11 @@ impl<'a> ExecutionContext<'a> {
         }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
-    pub fn execute_subroutine(
-        &self,
-        start: AbsoluteNodeId,
-        input_values: Vec<Rc<dyn Object>>,
-    ) -> Vec<Rc<dyn Object>> {
-        self.executor.lock().unwrap().execute_subroutine(start, input_values);
-        todo!()
+    pub fn execute_subroutine(&self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
+        self.executor
+            .lock()
+            .unwrap()
+            .execute_subroutine(start, input_values);
     }
 
     /// Finish executing subroutine, return to caller.
