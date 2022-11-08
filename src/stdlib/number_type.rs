@@ -20,7 +20,7 @@ impl Object for f64 {
     }
 
     fn as_bool(&self) -> bool {
-        !(*self == 0.0)
+        *self != 0.0
     }
 
     fn get_field(&self, _field: &str) -> &std::rc::Rc<dyn Object> {
