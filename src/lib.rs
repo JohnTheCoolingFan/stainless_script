@@ -4,10 +4,12 @@ use std::{
     collections::HashMap,
     error::Error,
     fmt::{Debug, Display},
+    num::ParseIntError,
     rc::Rc,
     str::FromStr,
     sync::Mutex,
 };
+use thiserror::Error;
 
 pub mod stdlib;
 
@@ -176,8 +178,47 @@ pub type ConnectionId = u32;
 pub type ProgramId = ModulePath;
 
 /// An ID to point to a node in other program
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AbsoluteNodeId(ProgramId, NodeId);
+
+impl Display for AbsoluteNodeId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}@{}", self.0, self.1)
+    }
+}
+
+impl FromStr for AbsoluteNodeId {
+    type Err = AbsoluteNodeIdParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut seq: Vec<String> = s.split('@').map(String::from).collect();
+        let node_id: NodeId = seq.pop().ok_or(AbsoluteNodeIdParseError::IdNotFound)?.parse()?;
+        let path: ProgramId = seq[0].parse()?;
+        Ok(Self(path, node_id))
+    }
+}
+
+#[derive(Debug, Clone, Error)]
+pub enum AbsoluteNodeIdParseError {
+    #[error("Node ID not found in string")]
+    IdNotFound,
+    #[error("Failed to parse Node ID: {0}")]
+    NodeIdParseError(ParseIntError),
+    #[error("Failed to parse program ID path: {0}")]
+    ProgramIdParseError(ModulePathParseError),
+}
+
+impl From<ParseIntError> for AbsoluteNodeIdParseError {
+    fn from(e: ParseIntError) -> Self {
+        Self::NodeIdParseError(e)
+    }
+}
+
+impl From<ModulePathParseError> for AbsoluteNodeIdParseError {
+    fn from(e: ModulePathParseError) -> Self {
+        Self::ProgramIdParseError(e)
+    }
+}
 
 /// ID of a branch of node
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -262,6 +303,30 @@ pub struct OutputSocketId(SocketId);
 /// Path in the module
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct ModulePath(Vec<String>, String);
+
+impl Display for ModulePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut res = self.0.clone();
+        res.push(self.1.clone());
+        write!(f, "{}", res.join("."))
+    }
+}
+
+impl FromStr for ModulePath {
+    type Err = ModulePathParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut seq: Vec<String> = s.split('.').map(String::from).collect();
+        let item_name = seq.pop().ok_or(ModulePathParseError::NotEnoughItems)?;
+        Ok(Self(seq, item_name))
+    }
+}
+
+#[derive(Debug, Clone, Error)]
+pub enum ModulePathParseError {
+    #[error("Not enough items")]
+    NotEnoughItems,
+}
 
 impl Serialize for ModulePath {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
