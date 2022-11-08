@@ -193,12 +193,13 @@ pub trait Node: Debug {
 }
 
 /// Collection of programs loaded into an executor
+#[derive(Debug, Clone, Default)]
 pub struct ProgramCollection {
     pub programs: HashMap<ProgramId, Program>,
 }
 
 /// A program that contains nodes, classes, constant objects, etc.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Program {
     pub imports: Vec<String>,
     pub nodes: HashMap<NodeId, NodeInfo>,
@@ -209,21 +210,21 @@ pub struct Program {
 }
 
 /// Information about a node stored in the program
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NodeInfo {
     pub class: ModulePath,
     pub variant: String,
 }
 
 /// Connection of a output to an input
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Connection {
     pub output: OutputSocketId,
     pub input: InputSocketId,
 }
 
 /// Description of a class stored in the program
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProtoClass {
     pub name: String,
     pub nodes: Vec<NodeId>,
