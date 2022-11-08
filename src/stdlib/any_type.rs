@@ -16,7 +16,7 @@ impl FromStr for AnyType {
     type Err = <String as FromStr>::Err;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        String::from_str(s).map(|s| AnyType(s))
+        String::from_str(s).map(AnyType)
     }
 }
 
