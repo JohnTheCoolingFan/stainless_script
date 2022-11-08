@@ -155,25 +155,127 @@ impl<'a> ExecutionContext<'a> {
 }
 
 /// ID of a node
-pub type NodeId = usize;
+pub type NodeId = u32;
+
+/// ID of data connection
+pub type ConnectionId = u32;
+
 /// ID of a program, constructed by an executor
 pub type ProgramId = ModulePath;
+
 /// An ID to point to a node in other program
-pub type AbsoluteNodeId = (ProgramId, NodeId);
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct AbsoluteNodeId(ProgramId, NodeId);
+
 /// ID of a branch of node
-pub type NodeBranchId = (NodeId, usize);
-/// ID of data connection
-pub type ConnectionId = usize;
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct NodeBranchId(NodeId, u32);
+
+impl From<&NodeBranchId> for u64 {
+    fn from(s: &NodeBranchId) -> Self {
+        (s.0 as u64) << 32 | s.1 as u64
+    }
+}
+
+impl From<u64> for NodeBranchId {
+    fn from(n: u64) -> Self {
+        let socket_idx: u32 = (((1 << 33) - 1) & n) as u32;
+        let node_id: NodeId = ((((1 << 33) - 1) << 32) & n) as NodeId;
+        Self(node_id, socket_idx)
+    }
+}
+
+impl Serialize for NodeBranchId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        u64::from(self).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for NodeBranchId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(NodeBranchId::from(u64::deserialize(deserializer)?))
+    }
+}
+
+/// ID of a socket, either input or output
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct SocketId(NodeId, u32);
+
+impl From<&SocketId> for u64 {
+    fn from(s: &SocketId) -> Self {
+        (s.0 as u64) << 32 | s.1 as u64
+    }
+}
+
+impl From<u64> for SocketId {
+    fn from(n: u64) -> Self {
+        let socket_idx: u32 = (((1_u64 << 33) - 1) & n) as u32;
+        let node_id: NodeId = ((((1_u64 << 33) - 1) << 32) & n) as NodeId;
+        Self(node_id, socket_idx)
+    }
+}
+
+impl Serialize for SocketId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        u64::from(self).serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for SocketId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(SocketId::from(u64::deserialize(deserializer)?))
+    }
+}
+
 /// ID of an input socket
-pub type InputSocketId = (NodeId, usize);
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub struct InputSocketId(SocketId);
+
 /// ID of an output socket
-pub type OutputSocketId = (NodeId, usize);
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Serialize)]
+pub struct OutputSocketId(SocketId);
+
 /// Path in the module
-pub type ModulePath = (Vec<String>, String);
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct ModulePath(Vec<String>, String);
+
+impl Serialize for ModulePath {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut ret = self.0.clone();
+        ret.push(self.1.clone());
+        ret.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for ModulePath {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let mut seq = Vec::<String>::deserialize(deserializer)?;
+        let item_name = seq.pop().unwrap();
+        Ok(Self(seq, item_name))
+    }
+}
 
 pub trait Node: Debug {
     /// Execution of the node's code. Returns a branch index.
-    fn execute(&self, context: &mut ExecutionContext) -> usize;
+    fn execute(&self, context: &mut ExecutionContext) -> u32;
     /// The class of the node
     fn class(&self) -> Class;
     /// Variants of a node. Internally can be anythingg that can be converted to string
@@ -187,7 +289,7 @@ pub trait Node: Debug {
     /// Get information about node's outputs
     fn outputs(&self) -> Vec<OutputSocket>;
     /// How many branches this node has
-    fn branches(&self) -> usize {
+    fn branches(&self) -> u32 {
         1
     }
 }

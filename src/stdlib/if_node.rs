@@ -13,9 +13,9 @@ pub fn if_node_class() -> Class {
 pub struct IfNode;
 
 impl Node for IfNode {
-    fn execute(&self, context: &mut ExecutionContext) -> usize {
+    fn execute(&self, context: &mut ExecutionContext) -> u32 {
         let cond = context.get_inputs()[0].as_bool();
-        cond as usize
+        cond as u32
     }
 
     fn class(&self) -> Class {
@@ -45,7 +45,7 @@ impl Node for IfNode {
         vec![]
     }
 
-    fn branches(&self) -> usize {
+    fn branches(&self) -> u32 {
         2
     }
 }

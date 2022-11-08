@@ -16,7 +16,7 @@ pub fn print_class() -> Class {
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct PrintVariant {
     ln: bool,
-    amount: usize,
+    amount: u32,
 }
 
 impl Display for PrintVariant {
@@ -81,7 +81,7 @@ impl From<ParseIntError> for PrintVariantParseError {
 pub struct Print(PrintVariant);
 
 impl Node for Print {
-    fn execute(&self, context: &mut ExecutionContext) -> usize {
+    fn execute(&self, context: &mut ExecutionContext) -> u32 {
         let to_print: String = context
             .get_inputs()
             .iter()
@@ -117,7 +117,7 @@ impl Node for Print {
     }
 
     fn inputs(&self) -> Vec<InputSocket> {
-        vec![InputSocket { class: any_class() }; self.0.amount]
+        vec![InputSocket { class: any_class() }; self.0.amount as usize]
     }
 
     fn outputs(&self) -> Vec<OutputSocket> {

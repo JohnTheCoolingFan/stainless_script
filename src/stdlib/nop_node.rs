@@ -13,7 +13,7 @@ pub fn nop_node_class() -> Class {
 pub struct NopNode;
 
 impl Node for NopNode {
-    fn execute(&self, _context: &mut ExecutionContext) -> usize {
+    fn execute(&self, _context: &mut ExecutionContext) -> u32 {
         0
     }
 

@@ -39,7 +39,7 @@ impl Object for bool {
 }
 
 impl Node for BoolConstructor {
-    fn execute(&self, context: &mut ExecutionContext) -> usize {
+    fn execute(&self, context: &mut ExecutionContext) -> u32 {
         let cond = context.get_inputs()[0].as_bool();
         context.set_outputs(vec![Rc::new(cond) as Rc<dyn Object>]);
         0
