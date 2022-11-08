@@ -6,6 +6,7 @@ use std::{
     fmt::{Debug, Display},
     rc::Rc,
     str::FromStr,
+    sync::Mutex,
 };
 
 pub mod stdlib;
@@ -92,11 +93,37 @@ pub struct OutputSocket {
     pub class: Class,
 }
 
+pub struct Executor {
+    node_stack: Vec<AbsoluteNodeId>,
+}
+
+impl Executor {
+    fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
+        self.node_stack.pop();
+        self.set_node_outputs(return_values);
+    }
+
+    fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
+        todo!()
+    }
+}
+
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
 /// through this context.
-pub struct ExecutionContext {}
+pub struct ExecutionContext<'a> {
+    executor: &'a Mutex<Executor>,
+    node_inputs: Vec<Rc<dyn Object>>,
+    node_outputs: Option<Vec<Rc<dyn Object>>>,
+}
 
-impl ExecutionContext {
+impl<'a> ExecutionContext<'a> {
+    pub fn new(executor: &'a Mutex<Executor>, node_inputs: Vec<Rc<dyn Object>>) -> Self {
+        Self {
+            executor,
+            node_inputs,
+            node_outputs: None,
+        }
+    }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
     pub fn execute_subroutine(
         &self,
@@ -108,15 +135,18 @@ impl ExecutionContext {
 
     /// Finish executing subroutine, return to caller.
     pub fn finish_subroutine(&self, return_values: Vec<Rc<dyn Object>>) {
-        todo!()
+        self.executor
+            .lock()
+            .unwrap()
+            .finish_subroutine(return_values);
     }
 
     pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
-        todo!()
+        self.node_inputs.clone()
     }
 
     pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        todo!()
+        self.node_outputs = Some(values)
     }
 }
 
