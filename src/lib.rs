@@ -106,6 +106,10 @@ impl Executor {
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
         todo!()
     }
+
+    fn current_node(&self) -> &AbsoluteNodeId {
+        self.node_stack.last().unwrap()
+    }
 }
 
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
