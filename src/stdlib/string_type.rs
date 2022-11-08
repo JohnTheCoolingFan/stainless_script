@@ -19,7 +19,7 @@ impl Object for String {
     }
 
     fn as_bool(&self) -> bool {
-        self.as_number() != 0.0
+        !self.is_empty()
     }
 
     fn get_field(&self, _field: &str) -> &std::rc::Rc<dyn Object> {
