@@ -101,6 +101,7 @@ pub struct OutputSocket {
 
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
+    node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
 }
 
 impl Executor {
@@ -109,8 +110,13 @@ impl Executor {
         self.set_node_outputs(return_values);
     }
 
+    fn execute_subroutine(&mut self, node_id: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
+        self.node_stack.push(node_id);
+        self.set_node_outputs(input_values);
+    }
+
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        todo!()
+        self.node_outputs.insert(self.current_node().clone(), values);
     }
 
     fn current_node(&self) -> &AbsoluteNodeId {
@@ -140,6 +146,7 @@ impl<'a> ExecutionContext<'a> {
         start: AbsoluteNodeId,
         input_values: Vec<Rc<dyn Object>>,
     ) -> Vec<Rc<dyn Object>> {
+        self.executor.lock().unwrap().execute_subroutine(start, input_values);
         todo!()
     }
 
