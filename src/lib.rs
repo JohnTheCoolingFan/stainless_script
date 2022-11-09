@@ -176,6 +176,10 @@ impl Executor {
     pub fn load_plugin(&mut self, plugin: impl Plugin) {
         todo!()
     }
+
+    pub fn start_execution(&mut self) {
+        todo!()
+    }
 }
 
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
