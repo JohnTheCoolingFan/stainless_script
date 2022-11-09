@@ -192,7 +192,10 @@ impl FromStr for AbsoluteNodeId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut seq: Vec<String> = s.split('@').map(String::from).collect();
-        let node_id: NodeId = seq.pop().ok_or(AbsoluteNodeIdParseError::IdNotFound)?.parse()?;
+        let node_id: NodeId = seq
+            .pop()
+            .ok_or(AbsoluteNodeIdParseError::IdNotFound)?
+            .parse()?;
         let path: ProgramId = seq[0].parse()?;
         Ok(Self(path, node_id))
     }
