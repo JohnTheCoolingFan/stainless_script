@@ -1,4 +1,4 @@
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
+use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::rc::Rc;
 
 use super::any_class;
@@ -7,6 +7,7 @@ pub fn number_class() -> Class {
     Class {
         name: "number".into(),
         node: Rc::new(NumberNode) as Rc<dyn Node>,
+        obj_from_str: Some(<f64 as ObjectFromStr>::from_str),
     }
 }
 

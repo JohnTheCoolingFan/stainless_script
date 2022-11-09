@@ -1,11 +1,12 @@
 use super::NopNode;
-use crate::{Class, Node, Object};
-use std::{rc::Rc, str::FromStr, fmt::Display};
+use crate::{Class, Node, Object, ObjectFromStr};
+use std::{fmt::Display, rc::Rc, str::FromStr};
 
 pub fn any_class() -> Class {
     Class {
         name: "any".into(),
         node: Rc::new(NopNode) as Rc<dyn Node>,
+        obj_from_str: Some(<AnyType as ObjectFromStr>::from_str),
     }
 }
 
@@ -16,7 +17,7 @@ impl FromStr for AnyType {
     type Err = <String as FromStr>::Err;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        String::from_str(s).map(AnyType)
+        <String as FromStr>::from_str(s).map(AnyType)
     }
 }
 

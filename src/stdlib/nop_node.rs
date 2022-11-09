@@ -5,6 +5,7 @@ pub fn nop_node_class() -> Class {
     Class {
         name: "nop".into(),
         node: Rc::new(NopNode) as Rc<dyn Node>,
+        obj_from_str: None,
     }
 }
 
@@ -18,10 +19,7 @@ impl Node for NopNode {
     }
 
     fn class(&self) -> Class {
-        Class {
-            name: "nop".into(),
-            node: Rc::new(self.clone()) as Rc<dyn Node>,
-        }
+        nop_node_class()
     }
 
     fn variants(&self) -> Vec<Cow<'_, str>> {

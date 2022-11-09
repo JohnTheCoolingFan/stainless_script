@@ -10,6 +10,7 @@ pub fn print_class() -> Class {
             ln: true,
             amount: 1,
         })) as Rc<dyn Node>,
+        obj_from_str: None,
     }
 }
 

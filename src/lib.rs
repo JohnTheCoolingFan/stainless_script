@@ -27,11 +27,12 @@ pub enum ModuleItem {
 
 /// Describes a data type. Provides default node that is usually a constructor or some other node.
 /// Variations of the default node are methods of this class.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Class {
     pub name: String,
     /// Default node to be placed when selecting a class to put. Usually a constructor method.
     pub node: Rc<dyn Node>,
+    pub obj_from_str: Option<fn(&str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>>,
 }
 
 impl PartialEq for Class {
@@ -41,6 +42,15 @@ impl PartialEq for Class {
 }
 
 impl Eq for Class {}
+
+impl Debug for Class {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Class")
+            .field("name", &self.name)
+            .field("node", &self.node)
+            .finish()
+    }
+}
 
 pub trait ObjectFromStr {
     fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>

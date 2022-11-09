@@ -1,11 +1,12 @@
 use super::{any_class, number_class, AnyType};
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
+use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::{fmt::Display, rc::Rc, str::FromStr};
 
 pub fn array_class() -> Class {
     Class {
         name: "array".into(),
         node: Rc::new(ArrayConstructor(1)) as Rc<dyn Node>,
+        obj_from_str: Some(<Array as ObjectFromStr>::from_str),
     }
 }
 

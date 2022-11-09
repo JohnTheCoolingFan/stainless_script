@@ -1,11 +1,12 @@
 use super::any_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
+use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::{borrow::Cow, rc::Rc};
 
 pub fn bool_class() -> Class {
     Class {
         name: "bool".into(),
         node: Rc::new(BoolNode) as Rc<dyn Node>,
+        obj_from_str: Some(<bool as ObjectFromStr>::from_str),
     }
 }
 

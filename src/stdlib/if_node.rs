@@ -6,6 +6,7 @@ pub fn if_node_class() -> Class {
     Class {
         name: "if".into(),
         node: Rc::new(IfNode) as Rc<dyn Node>,
+        obj_from_str: None,
     }
 }
 
@@ -19,10 +20,7 @@ impl Node for IfNode {
     }
 
     fn class(&self) -> Class {
-        Class {
-            name: "if".into(),
-            node: Rc::new(self.clone()) as Rc<dyn Node>,
-        }
+        if_node_class()
     }
 
     fn variants(&self) -> Vec<Cow<'_, str>> {
