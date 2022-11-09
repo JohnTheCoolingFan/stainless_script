@@ -76,13 +76,13 @@ pub trait Object: Display + Debug + ObjectFromStr {
     fn as_bool(&self) -> bool;
     /// Suggested implementation: Have a `HashMap<String, Rc<dyn Object>>` to manage fields.
     /// Default implementation is `unimplemented!()` because most types don't have fields.
-    fn get_field(&self, field: Rc<dyn Object>) -> Rc<dyn Object> {
+    fn get_field(&self, _field: Rc<dyn Object>) -> Rc<dyn Object> {
         unimplemented!()
     }
     /// Suggested implementation: use `String::from` to convert `&str` to `String` and use that as
     /// insertion key. Default implementation is `unimplemented!()` because most types don't have
     /// fields.
-    fn set_field(&mut self, field: Rc<dyn Object>, value: Rc<dyn Object>) {
+    fn set_field(&mut self, _field: Rc<dyn Object>, _value: Rc<dyn Object>) {
         unimplemented!()
     }
 }
