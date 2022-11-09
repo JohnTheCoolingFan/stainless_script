@@ -106,6 +106,8 @@ pub struct Executor {
     node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
 }
 
+pub type Plugin = (); // TODO
+
 impl Executor {
     fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
         self.node_stack.pop();
@@ -124,6 +126,26 @@ impl Executor {
 
     fn current_node(&self) -> &AbsoluteNodeId {
         self.node_stack.last().unwrap()
+    }
+
+    fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
+        todo!()
+    }
+
+    fn get_next_node(&self, current: AbsoluteNodeId) -> AbsoluteNodeId {
+        todo!()
+    }
+
+    pub fn load_module(&mut self, module: Program, name: ModulePath) {
+        todo!()
+    }
+
+    pub fn load_modules(&mut self, modules: ProgramCollection) {
+        todo!()
+    }
+
+    pub fn load_plugin(&mut self, plugin: Plugin) {
+        todo!()
     }
 }
 
