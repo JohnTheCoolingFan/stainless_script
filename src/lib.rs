@@ -105,7 +105,9 @@ pub struct Executor {
     node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
 }
 
-pub type Plugin = (); // TODO
+pub trait Plugin {
+    fn classes(&self) -> HashMap<ModulePath, Class>;
+}
 
 impl Executor {
     fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
@@ -143,7 +145,7 @@ impl Executor {
         todo!()
     }
 
-    pub fn load_plugin(&mut self, plugin: Plugin) {
+    pub fn load_plugin(&mut self, plugin: impl Plugin) {
         todo!()
     }
 }
