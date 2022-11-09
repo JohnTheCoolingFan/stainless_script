@@ -52,11 +52,10 @@ impl<T: 'static + FromStr + Object> ObjectFromStr for T
 where
     T::Err: 'static + Error + Send + Sync,
 {
-    fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>
-    where
-        Self: Sized,
-    {
-        <Self as FromStr>::from_str(s).map_err(Into::into).map(|o| Rc::new(o) as Rc<dyn Object>)
+    fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>> {
+        <Self as FromStr>::from_str(s)
+            .map_err(Into::into)
+            .map(|o| Rc::new(o) as Rc<dyn Object>)
     }
 }
 
