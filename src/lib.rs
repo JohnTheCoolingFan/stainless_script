@@ -43,20 +43,20 @@ impl PartialEq for Class {
 impl Eq for Class {}
 
 pub trait ObjectFromStr {
-    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>>
+    fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>
     where
         Self: Sized;
 }
 
-impl<T: FromStr> ObjectFromStr for T
+impl<T: 'static + FromStr + Object> ObjectFromStr for T
 where
     T::Err: 'static + Error + Send + Sync,
 {
-    fn from_str(s: &str) -> Result<Self, Box<dyn Error + Send + Sync>>
+    fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>
     where
         Self: Sized,
     {
-        <Self as FromStr>::from_str(s).map_err(Into::into)
+        <Self as FromStr>::from_str(s).map_err(Into::into).map(|o| Rc::new(o) as Rc<dyn Object>)
     }
 }
 
