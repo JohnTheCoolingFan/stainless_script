@@ -103,6 +103,7 @@ pub struct OutputSocket {
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
     node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
+    nodes: HashMap<AbsoluteNodeId, Rc<dyn Node>>,
 }
 
 pub trait Plugin {
@@ -120,13 +121,28 @@ impl Executor {
         self.set_node_outputs(input_values);
     }
 
-    fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.node_outputs
-            .insert(self.current_node().clone(), values);
+    fn get_node_inputs(&self, node_id: &AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
+        todo!()
     }
 
-    fn current_node(&self) -> &AbsoluteNodeId {
-        self.node_stack.last().unwrap()
+    fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
+        self.node_outputs.insert(self.current_node(), values);
+    }
+
+    fn current_node(&self) -> AbsoluteNodeId {
+        self.node_stack.last().unwrap().clone()
+    }
+
+    fn execute_current_node(self_mutex: Mutex<Self>) {
+        let (node_id, inputs) = {
+            let lock = self_mutex.lock().unwrap();
+            let node_id = lock.current_node();
+            let inputs = lock.get_node_inputs(&node_id);
+            drop(lock);
+            (node_id, inputs)
+        };
+        let context = ExecutionContext::new(&self_mutex, inputs);
+        todo!()
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
