@@ -121,7 +121,7 @@ impl Executor {
         self.set_node_outputs(input_values);
     }
 
-    fn get_node_inputs(&self, node_id: &AbsoluteNodeId) -> Vec<Rc<dyn Object>> {
+    fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
         todo!()
     }
 
@@ -134,22 +134,34 @@ impl Executor {
     }
 
     fn execute_current_node(self_mutex: Mutex<Self>) {
-        let (node_id, inputs) = {
+        let (node, inputs) = {
             let lock = self_mutex.lock().unwrap();
             let node_id = lock.current_node();
-            let inputs = lock.get_node_inputs(&node_id);
+            let inputs = lock.get_node_inputs();
+            let node = lock.get_node_by_id(node_id);
             drop(lock);
-            (node_id, inputs)
+            (node, inputs)
         };
-        let context = ExecutionContext::new(&self_mutex, inputs);
-        todo!()
+        let mut context = ExecutionContext::new(&self_mutex, inputs);
+        let branch = node.execute(&mut context);
+        {
+            let mut lock = self_mutex.lock().unwrap();
+            lock.set_node_outputs(context.node_outputs.unwrap());
+            lock.advance(branch)
+        }
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
-        todo!()
+        self.nodes.get(&node_id).unwrap().clone()
     }
 
-    fn get_next_node(&self, current: AbsoluteNodeId) -> AbsoluteNodeId {
+    fn advance(&mut self, branch: u32) {
+        let node_id = self.node_stack.pop().unwrap();
+        let next_node_id = self.get_next_node(node_id, branch);
+        self.node_stack.push(next_node_id)
+    }
+
+    fn get_next_node(&self, current: AbsoluteNodeId, branch: u32) -> AbsoluteNodeId {
         todo!()
     }
 
