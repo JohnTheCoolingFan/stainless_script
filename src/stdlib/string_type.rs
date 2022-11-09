@@ -5,7 +5,7 @@ use std::rc::Rc;
 pub fn string_class() -> Class {
     Class {
         name: "string".into(),
-        default_node: Rc::new(StringNode) as Rc<dyn Node>,
+        node: Rc::new(StringNode) as Rc<dyn Node>,
     }
 }
 

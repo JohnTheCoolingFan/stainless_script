@@ -5,7 +5,7 @@ use std::{borrow::Cow, rc::Rc};
 pub fn if_node_class() -> Class {
     Class {
         name: "if".into(),
-        default_node: Rc::new(IfNode) as Rc<dyn Node>,
+        node: Rc::new(IfNode) as Rc<dyn Node>,
     }
 }
 
@@ -21,7 +21,7 @@ impl Node for IfNode {
     fn class(&self) -> Class {
         Class {
             name: "if".into(),
-            default_node: Rc::new(self.clone()) as Rc<dyn Node>,
+            node: Rc::new(self.clone()) as Rc<dyn Node>,
         }
     }
 

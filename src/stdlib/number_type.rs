@@ -6,7 +6,7 @@ use super::any_class;
 pub fn number_class() -> Class {
     Class {
         name: "number".into(),
-        default_node: Rc::new(NumberNode) as Rc<dyn Node>,
+        node: Rc::new(NumberNode) as Rc<dyn Node>,
     }
 }
 

@@ -4,7 +4,7 @@ use std::{borrow::Cow, rc::Rc};
 pub fn nop_node_class() -> Class {
     Class {
         name: "nop".into(),
-        default_node: Rc::new(NopNode) as Rc<dyn Node>,
+        node: Rc::new(NopNode) as Rc<dyn Node>,
     }
 }
 
@@ -20,7 +20,7 @@ impl Node for NopNode {
     fn class(&self) -> Class {
         Class {
             name: "nop".into(),
-            default_node: Rc::new(self.clone()) as Rc<dyn Node>,
+            node: Rc::new(self.clone()) as Rc<dyn Node>,
         }
     }
 

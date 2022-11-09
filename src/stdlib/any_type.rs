@@ -5,7 +5,7 @@ use std::{rc::Rc, str::FromStr, fmt::Display};
 pub fn any_class() -> Class {
     Class {
         name: "any".into(),
-        default_node: Rc::new(NopNode) as Rc<dyn Node>,
+        node: Rc::new(NopNode) as Rc<dyn Node>,
     }
 }
 

@@ -5,7 +5,7 @@ use std::{fmt::Display, rc::Rc, str::FromStr};
 pub fn array_class() -> Class {
     Class {
         name: "array".into(),
-        default_node: Rc::new(ArrayConstructor(1)) as Rc<dyn Node>,
+        node: Rc::new(ArrayConstructor(1)) as Rc<dyn Node>,
     }
 }
 

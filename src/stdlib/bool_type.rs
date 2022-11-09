@@ -5,7 +5,7 @@ use std::{borrow::Cow, rc::Rc};
 pub fn bool_class() -> Class {
     Class {
         name: "bool".into(),
-        default_node: Rc::new(BoolNode) as Rc<dyn Node>,
+        node: Rc::new(BoolNode) as Rc<dyn Node>,
     }
 }
 

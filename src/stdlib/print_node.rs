@@ -6,7 +6,7 @@ use thiserror::Error;
 pub fn print_class() -> Class {
     Class {
         name: "print".into(),
-        default_node: Rc::new(Print(PrintVariant {
+        node: Rc::new(Print(PrintVariant {
             ln: true,
             amount: 1,
         })) as Rc<dyn Node>,

@@ -31,7 +31,7 @@ pub enum ModuleItem {
 pub struct Class {
     pub name: String,
     /// Default node to be placed when selecting a class to put. Usually a constructor method.
-    pub default_node: Rc<dyn Node>,
+    pub node: Rc<dyn Node>,
 }
 
 impl PartialEq for Class {
