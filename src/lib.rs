@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     error::Error,
     fmt::{Debug, Display},
     num::ParseIntError,
@@ -140,8 +140,38 @@ pub struct OutputSocket {
 }
 
 #[derive(Debug)]
+pub struct NodeStorage {
+    nodes: BTreeMap<NodeId, Rc<dyn Node>>,
+    next_vacant: NodeId,
+}
+
+impl NodeStorage {
+    fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+        self.nodes.get(&node_id).cloned()
+    }
+
+    fn remove_node(&mut self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+        let node = self.nodes.remove(&node_id);
+        if node_id < self.next_vacant {
+            self.next_vacant = node_id
+        }
+        node
+    }
+
+    fn insert_node(&mut self, node: Rc<dyn Node>) -> NodeId {
+        let mut node_id = self.next_vacant;
+        self.nodes.insert(node_id, node);
+        while self.nodes.get(&node_id).is_some() {
+            node_id += 1;
+        }
+        self.next_vacant = node_id;
+        node_id
+    }
+}
+
+#[derive(Debug)]
 pub struct LoadedProgramData {
-    nodes: HashMap<AbsoluteNodeId, Rc<dyn Node>>,
+    nodes: HashMap<ProgramId, NodeStorage>,
     modules: Module,
 }
 
@@ -166,6 +196,10 @@ impl LoadedProgramData {
     }
 
     fn load_programs(&mut self, programs: &ProgramCollection) {
+        todo!()
+    }
+
+    fn get_node(&self, node_id: &AbsoluteNodeId) -> Rc<dyn Node> {
         todo!()
     }
 }
@@ -222,7 +256,7 @@ impl Executor {
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
-        self.loaded.nodes.get(&node_id).unwrap().clone()
+        self.loaded.get_node(&node_id)
     }
 
     fn advance(&mut self, branch: u32) {
