@@ -23,6 +23,13 @@ impl Object for f64 {
     fn as_bool(&self) -> bool {
         *self != 0.0
     }
+
+    fn get_field(&self, field: Rc<dyn Object>) -> Rc<dyn Object> {
+        match field.as_string().as_ref() {
+            "is_integer" => Rc::new(self.fract() == 0.0) as Rc<dyn Object>,
+            _ => panic!("Unknown field: {field}")
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
