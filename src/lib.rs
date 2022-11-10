@@ -28,6 +28,16 @@ impl Module {
         }
         current_segment.insert(path.1, item.into());
     }
+
+    fn get_class(&self, path: &ModulePath) -> &Class {
+        let mut current_segment = &self.items;
+        for segment in &path.0 {
+            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else {todo!()};
+            current_segment = &next_segment.items;
+        }
+        let ModuleItem::Class(class) = current_segment.get(&path.1).unwrap() else {todo!()};
+        class
+    }
 }
 
 #[derive(Debug, Clone)]
