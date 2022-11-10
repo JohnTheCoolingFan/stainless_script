@@ -14,15 +14,34 @@ use thiserror::Error;
 pub mod stdlib;
 
 /// Used to index items across programs/packages. Built with executor upon loading programs.
+#[derive(Debug, Clone, Default)]
 pub struct Module {
     pub items: HashMap<String, ModuleItem>,
 }
 
+impl Module {
+    fn insert(&mut self, path: ModulePath, item: impl Into<ModuleItem>) {
+        let mut current_segment = &mut self.items;
+        for segment in path.0 {
+            let ModuleItem::Module(next_segment) = current_segment.entry(segment.clone()).or_insert_with(|| ModuleItem::Module(Module::default())) else {unreachable!()};
+            current_segment = &mut next_segment.items;
+        }
+        current_segment.insert(path.1, item.into());
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum ModuleItem {
     /// Not implemented yet, not parsed from the program file
     Constant(Rc<dyn Object>),
     Class(Class),
     Module(Module),
+}
+
+impl From<Class> for ModuleItem {
+    fn from(c: Class) -> Self {
+        Self::Class(c)
+    }
 }
 
 /// Describes a data type. Provides default node that is usually a constructor or some other node.
@@ -110,10 +129,33 @@ pub struct OutputSocket {
     pub class: Class,
 }
 
+#[derive(Debug)]
+pub struct LoadedProgramData {
+    nodes: HashMap<AbsoluteNodeId, Rc<dyn Node>>,
+    modules: Module,
+}
+
+impl LoadedProgramData {
+    fn new() -> Self {
+        Self {
+            nodes: HashMap::new(),
+            modules: Module {
+                items: HashMap::new(),
+            },
+        }
+    }
+
+    fn load_plugin(&mut self, plugin: impl Plugin) {
+        for (path, class) in plugin.classes() {
+            self.modules.insert(path, class)
+        }
+    }
+}
+
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
     node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
-    nodes: HashMap<AbsoluteNodeId, Rc<dyn Node>>,
+    loaded: LoadedProgramData,
 }
 
 pub trait Plugin {
@@ -162,7 +204,7 @@ impl Executor {
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
-        self.nodes.get(&node_id).unwrap().clone()
+        self.loaded.nodes.get(&node_id).unwrap().clone()
     }
 
     fn advance(&mut self, branch: u32) {
@@ -184,7 +226,7 @@ impl Executor {
     }
 
     pub fn load_plugin(&mut self, plugin: impl Plugin) {
-        todo!()
+        self.loaded.load_plugin(plugin)
     }
 
     pub fn start_execution(&mut self) {
