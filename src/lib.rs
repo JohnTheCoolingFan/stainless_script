@@ -39,11 +39,11 @@ impl Module {
         class
     }
 
-    fn get_class_mut(&self, path: &ModulePath) -> &mut Class {
-        let mut current_segment = &self.items;
+    fn get_class_mut(&mut self, path: &ModulePath) -> &mut Class {
+        let mut current_segment = &mut self.items;
         for segment in &path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else {todo!()};
-            current_segment = &next_segment.items;
+            let ModuleItem::Module(next_segment) = current_segment.get_mut(segment).unwrap() else {todo!()};
+            current_segment = &mut next_segment.items;
         }
         let ModuleItem::Class(class) = current_segment.get_mut(&path.1).unwrap() else {todo!()};
         class
@@ -305,7 +305,7 @@ impl Executor {
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
-        self.loaded.get_node(&node_id)
+        self.loaded.get_node(&node_id).unwrap()
     }
 
     fn advance(&mut self, branch: u32) {
