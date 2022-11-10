@@ -150,6 +150,14 @@ impl LoadedProgramData {
             self.modules.insert(path, class)
         }
     }
+
+    fn load_program(&mut self, program: &Program) {
+        todo!()
+    }
+
+    fn load_programs(&mut self, programs: &ProgramCollection) {
+        todo!()
+    }
 }
 
 pub struct Executor {
@@ -506,6 +514,7 @@ pub struct Program {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NodeInfo {
     pub class: ModulePath,
+    pub idx: usize,
     pub variant: String,
 }
 
