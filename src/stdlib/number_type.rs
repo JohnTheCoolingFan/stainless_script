@@ -27,7 +27,8 @@ impl Object for f64 {
     fn get_field(&self, field: Rc<dyn Object>) -> Rc<dyn Object> {
         match field.as_string().as_ref() {
             "is_integer" => Rc::new(self.fract() == 0.0) as Rc<dyn Object>,
-            _ => panic!("Unknown field: {field}")
+            "as_integer" => Rc::new(self - self.fract()) as Rc<dyn Object>,
+            _ => panic!("Unknown field: {field}"),
         }
     }
 }
