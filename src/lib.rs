@@ -31,7 +31,7 @@ pub enum ModuleItem {
 pub struct Class {
     pub name: String,
     /// Default node to be placed when selecting a class to put. Usually a constructor method.
-    pub node: Rc<dyn Node>,
+    pub nodes: Vec<Rc<dyn Node>>,
     pub obj_from_str: Option<fn(&str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>>,
 }
 
@@ -47,7 +47,7 @@ impl Debug for Class {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Class")
             .field("name", &self.name)
-            .field("node", &self.node)
+            .field("node", &self.nodes)
             .finish()
     }
 }

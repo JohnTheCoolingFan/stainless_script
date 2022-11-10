@@ -1,12 +1,12 @@
 use super::any_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket, ObjectFromStr};
+use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::rc::Rc;
 
 pub fn string_class() -> Class {
     Class {
         name: "string".into(),
-        node: Rc::new(StringNode) as Rc<dyn Node>,
-        obj_from_str: Some(<String as ObjectFromStr>::from_str)
+        nodes: vec![Rc::new(StringNode) as Rc<dyn Node>],
+        obj_from_str: Some(<String as ObjectFromStr>::from_str),
     }
 }
 

@@ -5,7 +5,7 @@ use std::{borrow::Cow, rc::Rc};
 pub fn if_node_class() -> Class {
     Class {
         name: "if".into(),
-        node: Rc::new(IfNode) as Rc<dyn Node>,
+        nodes: vec![Rc::new(IfNode) as Rc<dyn Node>],
         obj_from_str: None,
     }
 }

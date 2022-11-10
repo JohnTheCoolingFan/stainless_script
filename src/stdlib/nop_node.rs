@@ -4,7 +4,7 @@ use std::{borrow::Cow, rc::Rc};
 pub fn nop_node_class() -> Class {
     Class {
         name: "nop".into(),
-        node: Rc::new(NopNode) as Rc<dyn Node>,
+        nodes: vec![Rc::new(NopNode) as Rc<dyn Node>],
         obj_from_str: None,
     }
 }

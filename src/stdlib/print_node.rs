@@ -6,10 +6,10 @@ use thiserror::Error;
 pub fn print_class() -> Class {
     Class {
         name: "print".into(),
-        node: Rc::new(Print(PrintVariant {
+        nodes: vec![Rc::new(Print(PrintVariant {
             ln: true,
             amount: 1,
-        })) as Rc<dyn Node>,
+        })) as Rc<dyn Node>],
         obj_from_str: None,
     }
 }

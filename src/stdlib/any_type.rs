@@ -5,7 +5,7 @@ use std::{fmt::Display, rc::Rc, str::FromStr};
 pub fn any_class() -> Class {
     Class {
         name: "any".into(),
-        node: Rc::new(NopNode) as Rc<dyn Node>,
+        nodes: vec![Rc::new(NopNode) as Rc<dyn Node>],
         obj_from_str: Some(<AnyType as ObjectFromStr>::from_str),
     }
 }
