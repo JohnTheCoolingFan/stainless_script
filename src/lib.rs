@@ -235,7 +235,7 @@ impl LoadedProgramData {
 
     fn load_program(&mut self, path: &ProgramId, program: &Program) {
         let mut imported_classes: Vec<(Class, Vec<NodeId>)> = program.classes.iter().map(|pc| (Class {name: pc.name.clone(), nodes: vec![], obj_from_str: None}, pc.nodes.clone())).collect();
-        let inserted_program = self.programs.entry(path.clone()).or_insert(program.into());
+        let inserted_program = self.programs.entry(path.clone()).or_insert_with(|| program.into());
         for node in &program.nodes {
             todo!()
         }
