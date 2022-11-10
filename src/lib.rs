@@ -38,6 +38,16 @@ impl Module {
         let ModuleItem::Class(class) = current_segment.get(&path.1).unwrap() else {todo!()};
         class
     }
+
+    fn get_class_mut(&self, path: &ModulePath) -> &mut Class {
+        let mut current_segment = &self.items;
+        for segment in &path.0 {
+            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else {todo!()};
+            current_segment = &next_segment.items;
+        }
+        let ModuleItem::Class(class) = current_segment.get_mut(&path.1).unwrap() else {todo!()};
+        class
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -139,7 +149,7 @@ pub struct OutputSocket {
     pub class: Class,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct NodeStorage {
     nodes: BTreeMap<NodeId, Rc<dyn Node>>,
     next_vacant: NodeId,
@@ -167,18 +177,50 @@ impl NodeStorage {
         self.next_vacant = node_id;
         node_id
     }
+
+    fn insert_node_at(&mut self, node_id: NodeId, node: Rc<dyn Node>) {
+        self.nodes.insert(node_id, node);
+        while self.nodes.get(&self.next_vacant).is_some() {
+            self.next_vacant += 1;
+        }
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+struct LoadedProgram {
+    nodes: NodeStorage,
+    branch_edges: HashMap<NodeBranchId, NodeId>,
+    connections: HashMap<ConnectionId, Connection>,
+    const_inputs: HashMap<InputSocketId, String>,
+}
+
+impl From<&Program> for LoadedProgram {
+    fn from(p: &Program) -> Self {
+        Self {
+            nodes: NodeStorage::default(),
+            branch_edges: p.branch_edges.clone(),
+            connections: p.connections.clone(),
+            const_inputs: p.const_inputs.clone(),
+        }
+    }
+}
+
+impl LoadedProgram {
+    fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+        self.nodes.get_node(node_id)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct LoadedProgramData {
-    nodes: HashMap<ProgramId, NodeStorage>,
+    programs: HashMap<ProgramId, LoadedProgram>,
     modules: Module,
 }
 
 impl LoadedProgramData {
     fn new() -> Self {
         Self {
-            nodes: HashMap::new(),
+            programs: HashMap::new(),
             modules: Module {
                 items: HashMap::new(),
             },
@@ -191,16 +233,23 @@ impl LoadedProgramData {
         }
     }
 
-    fn load_program(&mut self, program: &Program) {
-        todo!()
+    fn load_program(&mut self, path: &ProgramId, program: &Program) {
+        let mut imported_classes: Vec<(Class, Vec<NodeId>)> = program.classes.iter().map(|pc| (Class {name: pc.name.clone(), nodes: vec![], obj_from_str: None}, pc.nodes.clone())).collect();
+        let inserted_program = self.programs.entry(path.clone()).or_insert(program.into());
+        for node in &program.nodes {
+            todo!()
+        }
     }
 
     fn load_programs(&mut self, programs: &ProgramCollection) {
-        todo!()
+        for (path, program) in &programs.programs {
+            self.load_program(path, program)
+        }
     }
 
-    fn get_node(&self, node_id: &AbsoluteNodeId) -> Rc<dyn Node> {
-        todo!()
+    fn get_node(&self, node_id: &AbsoluteNodeId) -> Option<Rc<dyn Node>> {
+        let program = self.programs.get(&node_id.0)?;
+        program.get_node(node_id.1)
     }
 }
 
@@ -269,12 +318,12 @@ impl Executor {
         todo!()
     }
 
-    pub fn load_module(&mut self, module: Program, name: ModulePath) {
-        todo!()
+    pub fn load_program(&mut self, program: Program, path: ModulePath) {
+        self.loaded.load_program(&path, &program)
     }
 
-    pub fn load_modules(&mut self, modules: ProgramCollection) {
-        todo!()
+    pub fn load_programs(&mut self, programs: ProgramCollection) {
+        self.loaded.load_programs(&programs)
     }
 
     pub fn load_plugin(&mut self, plugin: impl Plugin) {
@@ -546,9 +595,9 @@ pub struct ProgramCollection {
 /// A program that contains nodes, classes, constant objects, etc.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Program {
-    pub imports: Vec<String>,
+    pub imports: Vec<String>, // Is this even useful?
     pub nodes: HashMap<NodeId, NodeInfo>,
-    pub classes: HashMap<String, ProtoClass>,
+    pub classes: Vec<ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
     pub connections: HashMap<ConnectionId, Connection>,
     pub const_inputs: HashMap<InputSocketId, String>,
