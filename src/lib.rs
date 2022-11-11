@@ -29,24 +29,24 @@ impl Module {
         current_segment.insert(path.1, item.into());
     }
 
-    fn get_class(&self, path: &ModulePath) -> &Class {
+    fn get_class(&self, path: &ModulePath) -> Option<&Class> {
         let mut current_segment = &self.items;
         for segment in &path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else {todo!()};
+            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else { return None};
             current_segment = &next_segment.items;
         }
-        let ModuleItem::Class(class) = current_segment.get(&path.1).unwrap() else {todo!()};
-        class
+        let ModuleItem::Class(class) = current_segment.get(&path.1).unwrap() else {return None};
+        Some(class)
     }
 
-    fn get_class_mut(&mut self, path: &ModulePath) -> &mut Class {
+    fn get_class_mut(&mut self, path: &ModulePath) -> Option<&mut Class> {
         let mut current_segment = &mut self.items;
         for segment in &path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.get_mut(segment).unwrap() else {todo!()};
+            let ModuleItem::Module(next_segment) = current_segment.get_mut(segment).unwrap() else {return None};
             current_segment = &mut next_segment.items;
         }
-        let ModuleItem::Class(class) = current_segment.get_mut(&path.1).unwrap() else {todo!()};
-        class
+        let ModuleItem::Class(class) = current_segment.get_mut(&path.1).unwrap() else {return None};
+        Some(class)
     }
 }
 
@@ -236,7 +236,9 @@ impl LoadedProgram {
     }
 
     fn get_next_node(&self, current: NodeId, branch: usize) -> Option<NodeId> {
-        self.branch_edges.get(&NodeBranchId(current, branch)).copied()
+        self.branch_edges
+            .get(&NodeBranchId(current, branch))
+            .copied()
     }
 }
 
@@ -273,7 +275,7 @@ impl LoadedProgramData {
             .entry(path.clone())
             .or_insert_with(|| program.into());
         for (node_id, node) in &program.nodes {
-            let class = self.modules.get_class(&node.class);
+            let class = self.modules.get_class(&node.class).unwrap();
             inserted_program.insert_raw_node_at(*node_id, node, class);
         }
         for (mut class, node_ids) in imported_classes {
@@ -621,7 +623,6 @@ impl<'de> Deserialize<'de> for ModulePath {
 }
 
 pub trait Node: Debug {
-
     /// Execution of the node's code. Returns a branch index.
     fn execute(&self, context: &mut ExecutionContext) -> usize;
 
