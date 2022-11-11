@@ -249,13 +249,13 @@ pub struct LoadedProgramData {
 }
 
 impl LoadedProgramData {
-    fn load_plugin(&mut self, plugin: impl Plugin) {
+    pub fn load_plugin(&mut self, plugin: impl Plugin) {
         for (path, class) in plugin.classes() {
             self.modules.insert(path, class);
         }
     }
 
-    fn load_program(&mut self, path: &ProgramId, program: &Program) {
+    pub fn load_program(&mut self, path: &ProgramId, program: &Program) {
         let imported_classes: Vec<(ModulePath, Vec<NodeId>)> = program
             .classes
             .iter()
@@ -289,7 +289,7 @@ impl LoadedProgramData {
         }
     }
 
-    fn load_programs(&mut self, programs: &ProgramCollection) {
+    pub fn load_programs(&mut self, programs: &ProgramCollection) {
         for (path, program) in &programs.programs {
             self.load_program(path, program)
         }
@@ -308,8 +308,8 @@ impl LoadedProgramData {
     }
 }
 
-/// Initialize with Default::default, load plugins and programs through load_plugin and
-/// load_program, start execution with start_execution, execute step-by-step with execute_current_node (will advance automatically)
+/// Initialize with `Default::default` or `new_with_loaded` if you have already loaded data, load plugins and programs through `load_plugin` and
+/// `load_program`, start execution with `start_execution`, execute step-by-step with `execute_current_node` (will advance automatically)
 #[derive(Debug, Clone, Default)]
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
@@ -392,6 +392,15 @@ impl Executor {
     pub fn start_execution(&mut self, auto: bool) {
         self.auto_execution = auto;
         todo!()
+    }
+
+    pub fn new_with_loaded(loaded: LoadedProgramData) -> Self {
+        Self {
+            node_stack: Vec::default(),
+            node_outputs: HashMap::default(),
+            loaded,
+            auto_execution: bool::default(),
+        }
     }
 }
 
