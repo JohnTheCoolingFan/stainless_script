@@ -251,23 +251,24 @@ pub struct LoadedProgramData {
 impl LoadedProgramData {
     fn load_plugin(&mut self, plugin: impl Plugin) {
         for (path, class) in plugin.classes() {
-            self.modules.insert(path, class)
+            self.modules.insert(path, class);
         }
     }
 
     fn load_program(&mut self, path: &ProgramId, program: &Program) {
-        let imported_classes: Vec<(Class, Vec<NodeId>)> = program
+        let imported_classes: Vec<(ModulePath, Vec<NodeId>)> = program
             .classes
             .iter()
             .map(|pc| {
-                (
-                    Class {
-                        name: pc.name.clone(),
-                        nodes: vec![],
-                        obj_from_str: None,
-                    },
-                    pc.nodes.clone(),
-                )
+                let mut class_path = path.clone();
+                class_path.1 = pc.name.clone();
+                let class = Class {
+                    name: pc.name.clone(),
+                    nodes: vec![],
+                    obj_from_str: None,
+                };
+                self.modules.insert(class_path.clone(), class);
+                (class_path, pc.nodes.clone())
             })
             .collect();
         let inserted_program = self
@@ -278,15 +279,13 @@ impl LoadedProgramData {
             let class = self.modules.get_class(&node.class).unwrap();
             inserted_program.insert_raw_node_at(*node_id, node, class);
         }
-        for (mut class, node_ids) in imported_classes {
+        for (class_path, node_ids) in imported_classes {
+            let class = self.modules.get_class_mut(&class_path).unwrap();
             let loaded_nodes = node_ids
                 .iter()
                 .map(|id| inserted_program.get_node(*id).unwrap())
                 .collect();
-            let mut class_path = path.clone();
-            class_path.1 = class.name.clone();
             class.nodes = loaded_nodes;
-            self.modules.insert(class_path, class);
         }
     }
 
