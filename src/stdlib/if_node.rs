@@ -14,9 +14,9 @@ pub fn if_node_class() -> Class {
 pub struct IfNode;
 
 impl Node for IfNode {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let cond = context.get_inputs()[0].as_bool();
-        cond as u32
+        cond as usize
     }
 
     fn class(&self) -> Class {
@@ -45,5 +45,9 @@ impl Node for IfNode {
 
     fn branches(&self) -> u32 {
         2
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

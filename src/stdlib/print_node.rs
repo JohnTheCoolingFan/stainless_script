@@ -82,7 +82,7 @@ impl From<ParseIntError> for PrintVariantParseError {
 pub struct Print(PrintVariant);
 
 impl Node for Print {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let to_print: String = context
             .get_inputs()
             .iter()
@@ -127,5 +127,9 @@ impl Node for Print {
 
     fn outputs(&self) -> Vec<OutputSocket> {
         vec![]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

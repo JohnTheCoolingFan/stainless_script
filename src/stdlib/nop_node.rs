@@ -14,7 +14,7 @@ pub fn nop_node_class() -> Class {
 pub struct NopNode;
 
 impl Node for NopNode {
-    fn execute(&self, _context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, _context: &mut ExecutionContext) -> usize {
         0
     }
 
@@ -38,5 +38,9 @@ impl Node for NopNode {
 
     fn outputs(&self) -> Vec<OutputSocket> {
         vec![]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

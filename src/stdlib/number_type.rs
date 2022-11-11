@@ -37,7 +37,7 @@ impl Object for f64 {
 pub struct NumberNode;
 
 impl Node for NumberNode {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let res = context.get_inputs()[0].as_number();
         context.set_outputs(vec![Rc::new(res) as Rc<dyn Object>]);
         0
@@ -65,5 +65,9 @@ impl Node for NumberNode {
         vec![OutputSocket {
             class: number_class(),
         }]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

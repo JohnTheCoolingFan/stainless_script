@@ -79,7 +79,7 @@ impl Object for Array {
 pub struct ArrayConstructor(usize);
 
 impl Node for ArrayConstructor {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let items = context.get_inputs();
         context.set_outputs(vec![Rc::new(Array(items)) as Rc<dyn Object>]);
         0
@@ -113,5 +113,9 @@ impl Node for ArrayConstructor {
         vec![OutputSocket {
             class: array_class(),
         }]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

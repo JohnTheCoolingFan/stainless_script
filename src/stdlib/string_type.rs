@@ -28,7 +28,7 @@ impl Object for String {
 pub struct StringNode;
 
 impl Node for StringNode {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let ret = context.get_inputs()[0].as_string();
         context.set_outputs(vec![Rc::new(ret) as Rc<dyn Object>]);
         0
@@ -56,5 +56,9 @@ impl Node for StringNode {
         vec![OutputSocket {
             class: string_class(),
         }]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }

@@ -187,7 +187,7 @@ impl NodeStorage {
 }
 
 #[derive(Debug, Clone)]
-struct LoadedProgram {
+pub struct LoadedProgram {
     nodes: NodeStorage,
     branch_edges: HashMap<NodeBranchId, NodeId>,
     connections: HashMap<ConnectionId, Connection>,
@@ -206,27 +206,45 @@ impl From<&Program> for LoadedProgram {
 }
 
 impl LoadedProgram {
-    fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+    pub fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
         self.nodes.get_node(node_id)
+    }
+
+    pub fn insert_node(&mut self, node: Rc<dyn Node>) -> NodeId {
+        self.nodes.insert_node(node)
+    }
+
+    pub fn remove_node(&mut self, node_id: NodeId) {
+        self.nodes.remove_node(node_id);
+    }
+
+    pub fn insert_raw_node_at(
+        &mut self,
+        node_id: NodeId,
+        node: &NodeInfo,
+        class: &Class,
+    ) -> Rc<dyn Node> {
+        assert_eq!(node.class.1, class.name);
+        let mut loaded_node = class.nodes[node.idx].clone_node();
+        Rc::get_mut(&mut loaded_node)
+            .unwrap()
+            .set_variant(&node.variant);
+        self.nodes.insert_node_at(node_id, Rc::clone(&loaded_node));
+        loaded_node as Rc<dyn Node>
+    }
+
+    fn get_next_node(&self, current: NodeId, branch: usize) -> Option<NodeId> {
+        self.branch_edges.get(&NodeBranchId(current, branch)).copied()
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct LoadedProgramData {
     programs: HashMap<ProgramId, LoadedProgram>,
     modules: Module,
 }
 
 impl LoadedProgramData {
-    fn new() -> Self {
-        Self {
-            programs: HashMap::new(),
-            modules: Module {
-                items: HashMap::new(),
-            },
-        }
-    }
-
     fn load_plugin(&mut self, plugin: impl Plugin) {
         for (path, class) in plugin.classes() {
             self.modules.insert(path, class)
@@ -234,10 +252,37 @@ impl LoadedProgramData {
     }
 
     fn load_program(&mut self, path: &ProgramId, program: &Program) {
-        let mut imported_classes: Vec<(Class, Vec<NodeId>)> = program.classes.iter().map(|pc| (Class {name: pc.name.clone(), nodes: vec![], obj_from_str: None}, pc.nodes.clone())).collect();
-        let inserted_program = self.programs.entry(path.clone()).or_insert_with(|| program.into());
-        for node in &program.nodes {
-            todo!()
+        let imported_classes: Vec<(Class, Vec<NodeId>)> = program
+            .classes
+            .iter()
+            .map(|pc| {
+                (
+                    Class {
+                        name: pc.name.clone(),
+                        nodes: vec![],
+                        obj_from_str: None,
+                    },
+                    pc.nodes.clone(),
+                )
+            })
+            .collect();
+        let inserted_program = self
+            .programs
+            .entry(path.clone())
+            .or_insert_with(|| program.into());
+        for (node_id, node) in &program.nodes {
+            let class = self.modules.get_class(&node.class);
+            inserted_program.insert_raw_node_at(*node_id, node, class);
+        }
+        for (mut class, node_ids) in imported_classes {
+            let loaded_nodes = node_ids
+                .iter()
+                .map(|id| inserted_program.get_node(*id).unwrap())
+                .collect();
+            let mut class_path = path.clone();
+            class_path.1 = class.name.clone();
+            class.nodes = loaded_nodes;
+            self.modules.insert(class_path, class);
         }
     }
 
@@ -251,12 +296,23 @@ impl LoadedProgramData {
         let program = self.programs.get(&node_id.0)?;
         program.get_node(node_id.1)
     }
+
+    fn get_next_node(&self, node_id: &AbsoluteNodeId, branch: usize) -> Option<AbsoluteNodeId> {
+        let AbsoluteNodeId(program_path, node_id) = node_id;
+        let program = self.programs.get(program_path)?;
+        let next_node_id = program.get_next_node(*node_id, branch)?;
+        Some(AbsoluteNodeId(program_path.clone(), next_node_id))
+    }
 }
 
+/// Initialize with Default::default, load plugins and programs through load_plugin and
+/// load_program, start execution with start_execution, execute step-by-step with execute_current_node (will advance automatically)
+#[derive(Debug, Clone, Default)]
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
     node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
     loaded: LoadedProgramData,
+    auto_execution: bool,
 }
 
 pub trait Plugin {
@@ -286,7 +342,7 @@ impl Executor {
         self.node_stack.last().unwrap().clone()
     }
 
-    fn execute_current_node(self_mutex: Mutex<Self>) {
+    pub fn execute_current_node(self_mutex: Mutex<Self>) {
         let (node, inputs) = {
             let lock = self_mutex.lock().unwrap();
             let node_id = lock.current_node();
@@ -308,14 +364,14 @@ impl Executor {
         self.loaded.get_node(&node_id).unwrap()
     }
 
-    fn advance(&mut self, branch: u32) {
+    fn advance(&mut self, branch: usize) {
         let node_id = self.node_stack.pop().unwrap();
         let next_node_id = self.get_next_node(node_id, branch);
         self.node_stack.push(next_node_id)
     }
 
-    fn get_next_node(&self, current: AbsoluteNodeId, branch: u32) -> AbsoluteNodeId {
-        todo!()
+    fn get_next_node(&self, current: AbsoluteNodeId, branch: usize) -> AbsoluteNodeId {
+        self.loaded.get_next_node(&current, branch).unwrap()
     }
 
     pub fn load_program(&mut self, program: Program, path: ModulePath) {
@@ -330,7 +386,8 @@ impl Executor {
         self.loaded.load_plugin(plugin)
     }
 
-    pub fn start_execution(&mut self) {
+    pub fn start_execution(&mut self, auto: bool) {
+        self.auto_execution = auto;
         todo!()
     }
 }
@@ -433,7 +490,7 @@ impl From<ModulePathParseError> for AbsoluteNodeIdParseError {
 
 /// ID of a branch of node
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct NodeBranchId(NodeId, u32);
+pub struct NodeBranchId(NodeId, usize);
 
 impl From<&NodeBranchId> for u64 {
     fn from(s: &NodeBranchId) -> Self {
@@ -443,9 +500,9 @@ impl From<&NodeBranchId> for u64 {
 
 impl From<u64> for NodeBranchId {
     fn from(n: u64) -> Self {
-        let socket_idx: u32 = (((1 << 33) - 1) & n) as u32;
+        let branch_idx: u32 = (((1 << 33) - 1) & n) as u32;
         let node_id: NodeId = ((((1 << 33) - 1) << 32) & n) as NodeId;
-        Self(node_id, socket_idx)
+        Self(node_id, branch_idx as usize)
     }
 }
 
@@ -562,28 +619,40 @@ impl<'de> Deserialize<'de> for ModulePath {
 }
 
 pub trait Node: Debug {
+
     /// Execution of the node's code. Returns a branch index.
-    fn execute(&self, context: &mut ExecutionContext) -> u32;
+    fn execute(&self, context: &mut ExecutionContext) -> usize;
+
     /// The class of the node
     fn class(&self) -> Class;
+
     /// Variants of a node. Internally can be anythingg that can be converted to string
     fn variants(&self) -> Vec<Cow<'_, str>>;
+
     /// Current selected variant of the node
     fn current_variant(&self) -> Cow<'_, str>;
+
     /// Set a specific variant of a node
     fn set_variant(&mut self, variant: &str);
+
     /// Whether variation can be set as a custom string (not listed in `variants`) or not
     fn accepts_arbitrary_variants(&self) -> bool {
         false
     }
+
     /// Get information about node's inputs
     fn inputs(&self) -> Vec<InputSocket>;
+
     /// Get information about node's outputs
     fn outputs(&self) -> Vec<OutputSocket>;
+
     /// How many branches this node has
     fn branches(&self) -> u32 {
         1
     }
+
+    /// Clone the node itself instead of it wrapped in Rc
+    fn clone_node(&self) -> Rc<dyn Node>;
 }
 
 /// Collection of programs loaded into an executor

@@ -32,7 +32,7 @@ impl Object for bool {
 }
 
 impl Node for BoolNode {
-    fn execute(&self, context: &mut ExecutionContext) -> u32 {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let cond = context.get_inputs()[0].as_bool();
         context.set_outputs(vec![Rc::new(cond) as Rc<dyn Object>]);
         0
@@ -60,5 +60,9 @@ impl Node for BoolNode {
         vec![OutputSocket {
             class: bool_class(),
         }]
+    }
+
+    fn clone_node(&self) -> Rc<dyn Node> {
+        Rc::new(self.clone()) as Rc<dyn Node>
     }
 }
