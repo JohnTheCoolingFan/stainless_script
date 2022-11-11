@@ -64,6 +64,8 @@ impl From<Class> for ModuleItem {
     }
 }
 
+type ObjFromStrFn = fn(&str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>;
+
 /// Describes a data type. Provides default node that is usually a constructor or some other node.
 /// Variations of the default node are methods of this class.
 #[derive(Clone)]
@@ -71,7 +73,7 @@ pub struct Class {
     pub name: String,
     /// Default node to be placed when selecting a class to put. Usually a constructor method.
     pub nodes: Vec<Rc<dyn Node>>,
-    pub obj_from_str: Option<fn(&str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>>,
+    pub obj_from_str: Option<ObjFromStrFn>,
 }
 
 impl PartialEq for Class {
