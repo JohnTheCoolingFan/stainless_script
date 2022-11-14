@@ -158,11 +158,11 @@ pub struct NodeStorage {
 }
 
 impl NodeStorage {
-    fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+    pub fn get_node(&self, node_id: NodeId) -> Option<Rc<dyn Node>> {
         self.nodes.get(&node_id).cloned()
     }
 
-    fn remove_node(&mut self, node_id: NodeId) -> Option<Rc<dyn Node>> {
+    pub fn remove_node(&mut self, node_id: NodeId) -> Option<Rc<dyn Node>> {
         let node = self.nodes.remove(&node_id);
         if node_id < self.next_vacant {
             self.next_vacant = node_id
@@ -170,7 +170,7 @@ impl NodeStorage {
         node
     }
 
-    fn insert_node(&mut self, node: Rc<dyn Node>) -> NodeId {
+    pub fn insert_node(&mut self, node: Rc<dyn Node>) -> NodeId {
         let mut node_id = self.next_vacant;
         self.nodes.insert(node_id, node);
         while self.nodes.get(&node_id).is_some() {
@@ -180,7 +180,7 @@ impl NodeStorage {
         node_id
     }
 
-    fn insert_node_at(&mut self, node_id: NodeId, node: Rc<dyn Node>) {
+    pub fn insert_node_at(&mut self, node_id: NodeId, node: Rc<dyn Node>) {
         self.nodes.insert(node_id, node);
         while self.nodes.get(&self.next_vacant).is_some() {
             self.next_vacant += 1;
