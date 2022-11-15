@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     error::Error,
     fmt::{Debug, Display},
     num::ParseIntError,
@@ -192,7 +192,7 @@ impl NodeStorage {
 pub struct LoadedProgram {
     nodes: NodeStorage,
     branch_edges: HashMap<NodeBranchId, NodeId>,
-    connections: HashMap<ConnectionId, Connection>,
+    connections: HashSet<Connection>,
     const_inputs: HashMap<InputSocketId, String>,
 }
 
@@ -448,9 +448,6 @@ impl<'a> ExecutionContext<'a> {
 /// ID of a node
 pub type NodeId = u32;
 
-/// ID of data connection
-pub type ConnectionId = u32;
-
 /// ID of a program, constructed by an executor
 pub type ProgramId = ModulePath;
 
@@ -679,7 +676,7 @@ pub struct Program {
     pub nodes: HashMap<NodeId, NodeInfo>,
     pub classes: Vec<ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
-    pub connections: HashMap<ConnectionId, Connection>,
+    pub connections: HashSet<Connection>,
     pub const_inputs: HashMap<InputSocketId, String>,
 }
 
@@ -692,7 +689,7 @@ pub struct NodeInfo {
 }
 
 /// Connection of a output to an input
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct Connection {
     pub output: OutputSocketId,
     pub input: InputSocketId,
