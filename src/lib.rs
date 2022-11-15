@@ -93,6 +93,8 @@ impl Debug for Class {
     }
 }
 
+/// Types that implement FromStr should use their FromStr implementation. Other types should use
+/// ron (https://github.com/ron-rs/ron)
 pub trait ObjectFromStr {
     fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>
     where
