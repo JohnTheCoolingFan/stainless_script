@@ -699,5 +699,6 @@ pub struct Connection {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProtoClass {
     pub name: String,
+    /// IDs of subroutine call nodes that define the methods
     pub nodes: Vec<NodeId>,
 }
