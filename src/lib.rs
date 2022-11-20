@@ -307,7 +307,8 @@ impl LoadedProgramData {
                 let class = Class {
                     name: pc.name.clone(),
                     nodes: vec![],
-                    obj_from_str: None,
+                    obj_from_str: None, // TODO: Add a generic class initializer when
+                                        // DeserializeObject is implemented
                 };
                 self.modules.insert(class_path.clone(), class);
                 (class_path, pc.nodes.clone())
