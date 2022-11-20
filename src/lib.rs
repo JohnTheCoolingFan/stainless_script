@@ -248,6 +248,10 @@ impl LoadedProgram {
             .copied()
     }
 
+    // Problem with subroutines: data passing doesn't quite work for subroutines. The  possible
+    // solution is to have a dangling connection with an output node ID of u32::MAX and rely on
+    // editors to set that  correctly
+
     /// Set connection values where they originate from given node id
     fn set_outputs(&mut self, node_id: NodeId, outputs: Vec<Rc<dyn Object>>) {
         for (i, output) in outputs.into_iter().enumerate() {
