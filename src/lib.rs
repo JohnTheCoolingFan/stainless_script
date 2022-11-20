@@ -259,7 +259,6 @@ impl LoadedProgram {
         }
     }
 
-    // TODO: const inputs
     fn get_inputs(&self, node_id: NodeId) -> Vec<Option<Rc<dyn Object>>> {
         let connections: BTreeMap<usize, Rc<dyn Object>> = self
             .connections
