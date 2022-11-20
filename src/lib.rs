@@ -248,6 +248,7 @@ impl LoadedProgram {
             .copied()
     }
 
+    /// Set connection values where they originate from given node id
     fn set_outputs(&mut self, node_id: NodeId, outputs: Vec<Rc<dyn Object>>) {
         for (i, output) in outputs.into_iter().enumerate() {
             let connection = self
@@ -259,6 +260,9 @@ impl LoadedProgram {
         }
     }
 
+    /// Get inputs of a node from connections that end in the specified node, as well as collect
+    /// const inputs (generally, assumed they are present where it's not  provideds by a
+    /// connection. Although the connection mightt be empty, so this is kinda handled.)
     fn get_inputs(&self, node_id: NodeId) -> Vec<Option<Rc<dyn Object>>> {
         let connections: BTreeMap<usize, Rc<dyn Object>> = self
             .connections
