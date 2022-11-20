@@ -194,7 +194,7 @@ impl NodeStorage {
 pub struct LoadedProgram {
     nodes: NodeStorage,
     branch_edges: HashMap<NodeBranchId, NodeId>,
-    connections: HashSet<Connection>,
+    connections: HashMap<Connection, Option<Rc<dyn Object>>>,
     const_inputs: HashMap<InputSocketId, String>,
 }
 
@@ -203,7 +203,12 @@ impl From<&Program> for LoadedProgram {
         Self {
             nodes: NodeStorage::default(),
             branch_edges: p.branch_edges.clone(),
-            connections: p.connections.clone(),
+            connections: p
+                .connections
+                .iter()
+                .cloned()
+                .zip([None].into_iter().cycle())
+                .collect(),
             const_inputs: p.const_inputs.clone(),
         }
     }
@@ -241,6 +246,38 @@ impl LoadedProgram {
         self.branch_edges
             .get(&NodeBranchId(current, branch))
             .copied()
+    }
+
+    fn set_outputs(&mut self, node_id: NodeId, outputs: Vec<Rc<dyn Object>>) {
+        for (i, output) in outputs.into_iter().enumerate() {
+            let connection = self
+                .connections
+                .iter_mut()
+                .find(|(c, _)| c.output.0 .0 == node_id && c.output.0 .1 == i)
+                .unwrap();
+            *connection.1 = Some(output)
+        }
+    }
+
+    // TODO: const inputs
+    fn get_inputs(&self, node_id: NodeId) -> Vec<Option<Rc<dyn Object>>> {
+        let connections: BTreeMap<usize, Rc<dyn Object>> = self
+            .connections
+            .iter()
+            .filter_map(|(c, i)| {
+                (c.input.0 .0 == node_id).then(|| Some((c.input.0 .1, i.clone()?)))?
+            })
+            .chain(self.const_inputs.iter().filter_map(|(s, v)| {
+                let inputs = self.get_node(node_id).unwrap().inputs();
+                let class = &inputs.get(s.0 .1)?.class;
+                (s.0 .0 == node_id).then(|| (s.0 .1, class.obj_from_str.unwrap()(v).unwrap()))
+            }))
+            .collect();
+        let mut result: Vec<Option<Rc<dyn Object>>> = Vec::with_capacity(connections.keys().len());
+        for i in 0..=connections.iter().map(|(c, _)| *c).max().unwrap() {
+            result.push(connections.get(&i).cloned())
+        }
+        result
     }
 }
 
@@ -308,6 +345,17 @@ impl LoadedProgramData {
         let next_node_id = program.get_next_node(*node_id, branch)?;
         Some(AbsoluteNodeId(program_path.clone(), next_node_id))
     }
+
+    fn set_outputs(&mut self, node_id: &AbsoluteNodeId, outputs: Vec<Rc<dyn Object>>) {
+        self.programs
+            .get_mut(&node_id.0)
+            .unwrap()
+            .set_outputs(node_id.1, outputs)
+    }
+
+    fn get_inputs(&self, node_id: &AbsoluteNodeId) -> Vec<Option<Rc<dyn Object>>> {
+        self.programs.get(&node_id.0).unwrap().get_inputs(node_id.1)
+    }
 }
 
 /// Initialize with `Default::default` or `new_with_loaded` if you have already loaded data, load plugins and programs through `load_plugin` and
@@ -315,7 +363,6 @@ impl LoadedProgramData {
 #[derive(Debug, Clone, Default)]
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
-    node_outputs: HashMap<AbsoluteNodeId, Vec<Rc<dyn Object>>>,
     loaded: LoadedProgramData,
     auto_execution: bool,
 }
@@ -336,11 +383,15 @@ impl Executor {
     }
 
     fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
-        todo!()
+        self.loaded
+            .get_inputs(&self.current_node())
+            .into_iter()
+            .collect::<Option<Vec<Rc<dyn Object>>>>()
+            .unwrap()
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.node_outputs.insert(self.current_node(), values);
+        self.loaded.set_outputs(&self.current_node(), values)
     }
 
     fn current_node(&self) -> AbsoluteNodeId {
@@ -399,7 +450,6 @@ impl Executor {
     pub fn new_with_loaded(loaded: LoadedProgramData) -> Self {
         Self {
             node_stack: Vec::default(),
-            node_outputs: HashMap::default(),
             loaded,
             auto_execution: bool::default(),
         }
@@ -537,7 +587,7 @@ impl<'de> Deserialize<'de> for NodeBranchId {
 
 /// ID of a socket, either input or output
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct SocketId(NodeId, u32);
+pub struct SocketId(NodeId, usize);
 
 impl From<&SocketId> for u64 {
     fn from(s: &SocketId) -> Self {
@@ -547,7 +597,7 @@ impl From<&SocketId> for u64 {
 
 impl From<u64> for SocketId {
     fn from(n: u64) -> Self {
-        let socket_idx: u32 = (((1_u64 << 33) - 1) & n) as u32;
+        let socket_idx: usize = (((1_u64 << 33) - 1) & n) as usize;
         let node_id: NodeId = ((((1_u64 << 33) - 1) << 32) & n) as NodeId;
         Self(node_id, socket_idx)
     }
