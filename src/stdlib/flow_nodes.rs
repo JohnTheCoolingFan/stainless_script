@@ -51,6 +51,10 @@ impl Node for StartNode {
     fn clone_node(&self) -> Rc<dyn Node> {
         Rc::new(self.clone()) as Rc<dyn Node>
     }
+
+    fn accepts_arbitrary_variants(&self) -> bool {
+        true
+    }
 }
 
 /// End of a program or subroutine
@@ -86,5 +90,9 @@ impl Node for EndNode {
 
     fn clone_node(&self) -> Rc<dyn Node> {
         Rc::new(self.clone()) as Rc<dyn Node>
+    }
+
+    fn accepts_arbitrary_variants(&self) -> bool {
+        true
     }
 }
