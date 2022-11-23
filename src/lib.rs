@@ -255,12 +255,13 @@ impl LoadedProgram {
     /// Set connection values where they originate from given node id
     fn set_outputs(&mut self, node_id: NodeId, outputs: Vec<Rc<dyn Object>>) {
         for (i, output) in outputs.into_iter().enumerate() {
-            let connection = self
+            let connections = self
                 .connections
                 .iter_mut()
-                .find(|(c, _)| c.output.0 .0 == node_id && c.output.0 .1 == i)
-                .unwrap();
-            *connection.1 = Some(output)
+                .filter(|(c, _)| c.output.0 .0 == node_id && c.output.0 .1 == i);
+            for connection in connections {
+                *connection.1 = Some(output.clone())
+            }
         }
     }
 
