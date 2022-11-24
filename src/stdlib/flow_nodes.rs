@@ -1,4 +1,4 @@
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, OutputSocket};
+use crate::{Class, ExecutionContext, InputSocket, Node, OutputSocket};
 use std::rc::Rc;
 
 pub fn start_node_class() -> Class {
@@ -31,14 +31,16 @@ impl Node for StartNode {
     }
 
     fn variants(&self) -> Vec<std::borrow::Cow<'_, str>> {
-        vec!["start".into()]
+        vec!["start[]".into(), self.current_variant()]
     }
 
     fn current_variant(&self) -> std::borrow::Cow<'_, str> {
-        "start".into()
+        format!("start{}", ron::to_string(&self.0).unwrap()).into()
     }
 
-    fn set_variant(&mut self, _variant: &str) {}
+    fn set_variant(&mut self, variant: &str) {
+        self.0 = ron::from_str(variant.strip_prefix("start").unwrap()).unwrap()
+    }
 
     fn inputs(&self) -> Vec<InputSocket> {
         vec![]
@@ -71,14 +73,16 @@ impl Node for EndNode {
     }
 
     fn variants(&self) -> Vec<std::borrow::Cow<'_, str>> {
-        vec!["end".into()]
+        vec!["end[]".into(), self.current_variant()]
     }
 
     fn current_variant(&self) -> std::borrow::Cow<'_, str> {
-        "end".into()
+        format!("end{}", ron::to_string(&self.0).unwrap()).into()
     }
 
-    fn set_variant(&mut self, _variant: &str) {}
+    fn set_variant(&mut self, variant: &str) {
+        self.0 = ron::from_str(variant.strip_prefix("end").unwrap()).unwrap()
+    }
 
     fn inputs(&self) -> Vec<InputSocket> {
         self.0.clone()

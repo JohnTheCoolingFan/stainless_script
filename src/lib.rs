@@ -93,6 +93,29 @@ impl Debug for Class {
     }
 }
 
+impl Serialize for Class {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.name.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for Class {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let name = String::deserialize(deserializer)?;
+        Ok(Self {
+            name,
+            nodes: vec![],
+            obj_from_str: None,
+        })
+    }
+}
+
 /// Types that implement FromStr should use their FromStr implementation. Other types should use
 /// ron (https://github.com/ron-rs/ron)
 pub trait ObjectFromStr {
@@ -147,10 +170,48 @@ pub struct InputSocket {
     pub class: Class,
 }
 
+impl Serialize for InputSocket {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.class.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for InputSocket {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let class = Class::deserialize(deserializer)?;
+        Ok(Self { class })
+    }
+}
+
 /// Output of a node
 #[derive(Debug, Clone)]
 pub struct OutputSocket {
     pub class: Class,
+}
+
+impl Serialize for OutputSocket {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.class.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for OutputSocket {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let class = Class::deserialize(deserializer)?;
+        Ok(Self { class })
+    }
 }
 
 #[derive(Debug, Clone, Default)]
