@@ -1,4 +1,10 @@
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    object::{Object, ObjectFromStr},
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::rc::Rc;
 
 use super::any_class;

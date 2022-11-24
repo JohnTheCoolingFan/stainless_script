@@ -1,5 +1,6 @@
+use crate::{class::Class, node::Node, object::{ObjectFromStr, Object}, ExecutionContext, socket::{InputSocket, OutputSocket}};
+
 use super::any_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::{borrow::Cow, rc::Rc};
 
 pub fn bool_class() -> Class {

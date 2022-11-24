@@ -1,5 +1,11 @@
 use super::{any_class, number_class, AnyType};
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    object::{Object, ObjectFromStr},
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::{fmt::Display, rc::Rc, str::FromStr};
 
 pub fn array_class() -> Class {

@@ -1,4 +1,9 @@
-use crate::{Class, ExecutionContext, InputSocket, Node, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::{borrow::Cow, rc::Rc};
 
 pub fn nop_node_class() -> Class {

@@ -1,5 +1,10 @@
 use super::bool_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::{borrow::Cow, rc::Rc};
 
 pub fn if_node_class() -> Class {

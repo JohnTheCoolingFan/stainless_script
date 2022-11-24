@@ -1,4 +1,9 @@
-use crate::{Class, ExecutionContext, InputSocket, Node, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::rc::Rc;
 
 pub fn start_node_class() -> Class {

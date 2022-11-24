@@ -1,5 +1,9 @@
 use super::NopNode;
-use crate::{Class, Node, Object, ObjectFromStr};
+use crate::{
+    class::Class,
+    node::Node,
+    object::{Object, ObjectFromStr},
+};
 use std::{fmt::Display, rc::Rc, str::FromStr};
 
 pub fn any_class() -> Class {

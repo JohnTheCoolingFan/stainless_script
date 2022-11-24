@@ -1,5 +1,10 @@
 use super::any_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, OutputSocket};
+use crate::{
+    class::Class,
+    node::Node,
+    socket::{InputSocket, OutputSocket},
+    ExecutionContext,
+};
 use std::{borrow::Cow, fmt::Display, num::ParseIntError, rc::Rc, str::FromStr};
 use thiserror::Error;
 

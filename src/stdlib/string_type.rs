@@ -1,5 +1,6 @@
+use crate::{class::Class, object::{Object, ObjectFromStr}, node::Node, ExecutionContext, socket::{InputSocket, OutputSocket}};
+
 use super::any_class;
-use crate::{Class, ExecutionContext, InputSocket, Node, Object, ObjectFromStr, OutputSocket};
 use std::rc::Rc;
 
 pub fn string_class() -> Class {
