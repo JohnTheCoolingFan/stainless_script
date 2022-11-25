@@ -27,8 +27,8 @@ pub fn end_node_class() -> Class {
 pub struct StartNode(Vec<OutputSocket>);
 
 impl Node for StartNode {
-    fn execute(&self, context: &mut ExecutionContext) -> usize {
-        todo!()
+    fn execute(&self, _context: &mut ExecutionContext) -> usize {
+        0
     }
 
     fn class(&self) -> Class {
@@ -70,7 +70,9 @@ pub struct EndNode(Vec<InputSocket>);
 
 impl Node for EndNode {
     fn execute(&self, context: &mut ExecutionContext) -> usize {
-        todo!()
+        let inputs = context.get_inputs();
+        context.finish_subroutine(inputs);
+        0
     }
 
     fn class(&self) -> Class {
