@@ -27,14 +27,14 @@ pub struct Executor {
 }
 
 impl Executor {
-    fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
-        self.node_stack.pop();
-        self.set_node_outputs(return_values);
-    }
-
     fn execute_subroutine(&mut self, node_id: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
         self.node_stack.push(node_id);
         self.set_node_outputs(input_values);
+    }
+
+    fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
+        self.node_stack.pop();
+        self.set_node_outputs(return_values);
     }
 
     fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
