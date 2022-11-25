@@ -59,8 +59,9 @@ impl Executor {
         let node = self.get_node_by_id(node_id);
         let mut context = ExecutionContext::new(self, inputs);
         let branch = node.execute(&mut context);
-        let node_outputs = context.node_outputs.unwrap();
-        self.set_node_outputs(node_outputs);
+        if let Some(node_outputs) = context.node_outputs {
+            self.set_node_outputs(node_outputs)
+        }
         self.advance(branch)
     }
 
