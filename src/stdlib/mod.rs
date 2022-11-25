@@ -7,6 +7,7 @@ mod nop_node;
 mod number_type;
 mod print_node;
 mod string_type;
+mod subroutine;
 
 pub use any_type::*;
 pub use array_type::*;
@@ -17,3 +18,4 @@ pub use nop_node::*;
 pub use number_type::*;
 pub use print_node::*;
 pub use string_type::*;
+pub use subroutine::*;
