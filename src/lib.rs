@@ -93,6 +93,7 @@ impl Executor {
 
     pub fn start_execution(&mut self, auto: bool) {
         self.auto_execution = auto;
+        let start_node = self.loaded.get_start_node(ModulePath(vec![], "__main__".into()), "main");
         todo!()
     }
 

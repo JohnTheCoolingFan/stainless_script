@@ -44,6 +44,21 @@ impl LoadedProgram {
         self.nodes.get_node(node_id)
     }
 
+    pub fn get_start_node(&self, name: &str) -> Option<NodeId> {
+        for (node_id, node) in &self.nodes.nodes {
+            if node.class().name == "start" {
+                let variant = node.current_variant();
+                let mut parts = variant.split('#');
+                parts.next();
+                let node_name = parts.next()?;
+                if node_name == name {
+                    return Some(*node_id)
+                }
+            }
+        }
+        None
+    }
+
     pub fn insert_node(&mut self, node: Rc<dyn Node>) -> NodeId {
         self.nodes.insert_node(node)
     }
@@ -171,6 +186,11 @@ impl LoadedProgramData {
     pub fn get_node(&self, node_id: &AbsoluteNodeId) -> Option<Rc<dyn Node>> {
         let program = self.programs.get(&node_id.0)?;
         program.get_node(node_id.1)
+    }
+
+    pub fn get_start_node(&self, program_id: ProgramId, name: &str) -> Option<AbsoluteNodeId> {
+        let program = self.programs.get(&program_id)?;
+        program.get_start_node(name).map(|i| AbsoluteNodeId(program_id.clone(), i))
     }
 
     pub fn get_next_node(&self, node_id: &AbsoluteNodeId, branch: usize) -> Option<AbsoluteNodeId> {
