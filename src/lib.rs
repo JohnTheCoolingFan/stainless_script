@@ -3,7 +3,7 @@ use module::ModulePath;
 use node::{AbsoluteNodeId, Node};
 use object::Object;
 use program::{LoadedProgramData, Program, ProgramCollection};
-use std::{collections::HashMap, fmt::Debug, rc::Rc, sync::Mutex};
+use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
 pub mod class;
 pub mod module;
@@ -53,22 +53,15 @@ impl Executor {
         self.node_stack.last().unwrap().clone()
     }
 
-    pub fn execute_current_node(self_mutex: Mutex<Self>) {
-        let (node, inputs) = {
-            let lock = self_mutex.lock().unwrap();
-            let node_id = lock.current_node();
-            let inputs = lock.get_node_inputs();
-            let node = lock.get_node_by_id(node_id);
-            drop(lock);
-            (node, inputs)
-        };
-        let mut context = ExecutionContext::new(&self_mutex, inputs);
+    pub fn execute_current_node(&mut self) {
+        let node_id = self.current_node();
+        let inputs = self.get_node_inputs();
+        let node = self.get_node_by_id(node_id);
+        let mut context = ExecutionContext::new(self, inputs);
         let branch = node.execute(&mut context);
-        {
-            let mut lock = self_mutex.lock().unwrap();
-            lock.set_node_outputs(context.node_outputs.unwrap());
-            lock.advance(branch)
-        }
+        let node_outputs = context.node_outputs.unwrap();
+        self.set_node_outputs(node_outputs);
+        self.advance(branch)
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
@@ -114,13 +107,13 @@ impl Executor {
 /// Context for nodes. Nodes get their inputs, set their ouputs, redirect to subroutine and other
 /// through this context.
 pub struct ExecutionContext<'a> {
-    executor: &'a Mutex<Executor>,
+    executor: &'a mut Executor,
     node_inputs: Vec<Rc<dyn Object>>,
     node_outputs: Option<Vec<Rc<dyn Object>>>,
 }
 
 impl<'a> ExecutionContext<'a> {
-    fn new(executor: &'a Mutex<Executor>, node_inputs: Vec<Rc<dyn Object>>) -> Self {
+    fn new(executor: &'a mut Executor, node_inputs: Vec<Rc<dyn Object>>) -> Self {
         Self {
             executor,
             node_inputs,
@@ -128,19 +121,13 @@ impl<'a> ExecutionContext<'a> {
         }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
-    pub fn execute_subroutine(&self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
-        self.executor
-            .lock()
-            .unwrap()
-            .execute_subroutine(start, input_values);
+    pub fn execute_subroutine(&mut self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
+        self.executor.execute_subroutine(start, input_values);
     }
 
     /// Finish executing subroutine, return to caller.
-    pub fn finish_subroutine(&self, return_values: Vec<Rc<dyn Object>>) {
-        self.executor
-            .lock()
-            .unwrap()
-            .finish_subroutine(return_values);
+    pub fn finish_subroutine(&mut self, return_values: Vec<Rc<dyn Object>>) {
+        self.executor.finish_subroutine(return_values);
     }
 
     pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
