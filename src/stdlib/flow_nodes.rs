@@ -9,7 +9,10 @@ use std::rc::Rc;
 pub fn start_node_class() -> Class {
     Class {
         name: "start".into(),
-        nodes: vec![Rc::new(StartNode(vec![])) as Rc<dyn Node>],
+        nodes: vec![Rc::new(StartNode {
+            outputs: vec![],
+            name: "default".into(),
+        }) as Rc<dyn Node>],
         obj_from_str: None,
     }
 }
@@ -24,7 +27,10 @@ pub fn end_node_class() -> Class {
 
 /// Start of a program or subroutine
 #[derive(Debug, Clone)]
-pub struct StartNode(Vec<OutputSocket>);
+pub struct StartNode {
+    outputs: Vec<OutputSocket>,
+    name: String,
+}
 
 impl Node for StartNode {
     fn execute(&self, _context: &mut ExecutionContext) -> usize {
@@ -36,15 +42,20 @@ impl Node for StartNode {
     }
 
     fn variants(&self) -> Vec<std::borrow::Cow<'_, str>> {
-        vec!["start[]".into(), self.current_variant()]
+        vec!["start#default#[]".into(), self.current_variant()]
     }
 
     fn current_variant(&self) -> std::borrow::Cow<'_, str> {
-        format!("start{}", ron::to_string(&self.0).unwrap()).into()
+        format!("start#{}#{}", self.name, ron::to_string(&self.outputs).unwrap()).into()
     }
 
     fn set_variant(&mut self, variant: &str) {
-        self.0 = ron::from_str(variant.strip_prefix("start").unwrap()).unwrap()
+        let mut parts = variant.split('#');
+        parts.next();
+        let name = String::from(parts.next().unwrap());
+        let outputs = ron::from_str(parts.next().unwrap()).unwrap();
+        self.name = name;
+        self.outputs = outputs
     }
 
     fn inputs(&self) -> Vec<InputSocket> {
@@ -52,7 +63,7 @@ impl Node for StartNode {
     }
 
     fn outputs(&self) -> Vec<OutputSocket> {
-        self.0.clone()
+        self.outputs.clone()
     }
 
     fn clone_node(&self) -> Rc<dyn Node> {
