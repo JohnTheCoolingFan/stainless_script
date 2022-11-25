@@ -18,7 +18,7 @@ pub trait Plugin {
 }
 
 /// Initialize with `Default::default` or `new_with_loaded` if you have already loaded data, load plugins and programs through `load_plugin` and
-/// `load_program`, start execution with `start_execution`, execute step-by-step with `execute_current_node` (will advance automatically)
+/// `load_program`, start execution with `start_execution`, execute step-by-step with `execute_step` (will advance automatically)
 #[derive(Debug, Clone, Default)]
 pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
@@ -53,7 +53,7 @@ impl Executor {
         self.node_stack.last().unwrap().clone()
     }
 
-    pub fn execute_current_node(&mut self) {
+    pub fn execute_step(&mut self) {
         let node_id = self.current_node();
         let inputs = self.get_node_inputs();
         let node = self.get_node_by_id(node_id);
@@ -62,7 +62,7 @@ impl Executor {
         if let Some(node_outputs) = context.node_outputs {
             self.set_node_outputs(node_outputs)
         }
-        self.advance(branch)
+        self.advance(branch);
     }
 
     fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
@@ -93,8 +93,22 @@ impl Executor {
 
     pub fn start_execution(&mut self, auto: bool) {
         self.auto_execution = auto;
-        let start_node = self.loaded.get_start_node(ModulePath(vec![], "__main__".into()), "main");
-        todo!()
+        let start_node = self
+            .loaded
+            .get_start_node(ModulePath(vec![], "__main__".into()), "main");
+        self.node_stack.push(start_node.unwrap());
+        if self.auto_execution {
+            while !self.node_stack.is_empty() {
+                self.execute_step()
+            }
+        }
+    }
+
+    pub fn resume_auto(&mut self) {
+        self.auto_execution = true;
+        while !self.node_stack.is_empty() {
+            self.execute_step()
+        }
     }
 
     pub fn new_with_loaded(loaded: LoadedProgramData) -> Self {
