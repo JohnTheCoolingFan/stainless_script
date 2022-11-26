@@ -24,6 +24,7 @@ pub struct Executor {
     node_stack: Vec<AbsoluteNodeId>,
     loaded: LoadedProgramData,
     auto_execution: bool,
+    stop_point: Option<AbsoluteNodeId>,
 }
 
 impl Executor {
@@ -97,18 +98,29 @@ impl Executor {
             .loaded
             .get_start_node(ModulePath(vec![], "__main__".into()), "main");
         self.node_stack.push(start_node.unwrap());
-        if self.auto_execution {
-            while !self.node_stack.is_empty() {
-                self.execute_step()
+        self.execution_loop();
+    }
+
+    fn execution_loop(&mut self) {
+        while !self.node_stack.is_empty() && self.auto_execution {
+            self.execute_step();
+            if let Some(node) = &self.stop_point {
+                if &self.current_node() == node {
+                    self.auto_execution = false
+                }
             }
         }
     }
 
     pub fn resume_auto(&mut self) {
         self.auto_execution = true;
-        while !self.node_stack.is_empty() {
-            self.execute_step()
-        }
+        self.execution_loop();
+    }
+
+    pub fn resume_until(&mut self, node: AbsoluteNodeId) {
+        self.stop_point = Some(node);
+        self.auto_execution = true;
+        self.execution_loop();
     }
 
     pub fn new_with_loaded(loaded: LoadedProgramData) -> Self {
@@ -116,6 +128,7 @@ impl Executor {
             node_stack: Vec::default(),
             loaded,
             auto_execution: bool::default(),
+            stop_point: None,
         }
     }
 }
