@@ -3,6 +3,7 @@ use module::ModulePath;
 use node::{AbsoluteNodeId, Node};
 use object::Object;
 use program::{LoadedProgramData, Program, ProgramCollection};
+use socket::InputSocket;
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
 pub mod class;
@@ -57,7 +58,8 @@ impl Executor {
     pub fn execute_step(&mut self) {
         let node_id = self.current_node();
         let node = self.get_node_by_id(node_id);
-        let mut context = ExecutionContext::new(self);
+        let inputs = node.inputs();
+        let mut context = ExecutionContext::new(self, inputs);
         let branch = node.execute(&mut context);
         self.advance(branch);
     }
@@ -133,11 +135,12 @@ impl Executor {
 /// through this context.
 pub struct ExecutionContext<'a> {
     executor: &'a mut Executor,
+    inputs: Vec<InputSocket>,
 }
 
 impl<'a> ExecutionContext<'a> {
-    fn new(executor: &'a mut Executor) -> Self {
-        Self { executor }
+    fn new(executor: &'a mut Executor, inputs: Vec<InputSocket>) -> Self {
+        Self { executor, inputs }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
     pub fn execute_subroutine(&mut self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
@@ -150,7 +153,12 @@ impl<'a> ExecutionContext<'a> {
     }
 
     pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
-        self.executor.get_node_inputs()
+        self.executor
+            .get_node_inputs()
+            .into_iter()
+            .zip(self.inputs.iter())
+            .map(|(iv, ec)| iv.cast_to(&ec.class))
+            .collect()
     }
 
     pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
