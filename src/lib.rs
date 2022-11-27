@@ -3,8 +3,8 @@ use module::ModulePath;
 use node::{AbsoluteNodeId, Node};
 use object::Object;
 use program::{LoadedProgramData, Program, ProgramCollection};
-use socket::InputSocket;
-use std::{collections::HashMap, fmt::Debug, rc::Rc};
+use socket::{InputSocket, OutputSocket};
+use std::{collections::HashMap, fmt::Debug, rc::Rc, str::FromStr};
 
 pub mod class;
 pub mod module;
@@ -58,11 +58,24 @@ impl Executor {
     pub fn execute_step(&mut self) {
         let node_id = self.current_node();
         let node = self.get_node_by_id(node_id);
-        let inputs = node.inputs();
-        // Possible solution so casts work through subroutine calls: put input sockets into
-        // execution context and fetch them before creation of the context
-        let cast = !inputs[0].class.name.starts_with("subroutine_input@");
-        let mut context = ExecutionContext::new(self, inputs, cast);
+        let mut inputs = node.inputs();
+        if inputs[0].class.name.starts_with("subroutine_input@") {
+            let id = AbsoluteNodeId::from_str(
+                inputs[0]
+                    .class
+                    .name
+                    .strip_prefix("subroutine_input@")
+                    .unwrap(),
+            )
+            .unwrap();
+            let real_node = self.get_node_by_id(id);
+            inputs = real_node
+                .outputs()
+                .into_iter()
+                .map(|os| InputSocket { class: os.class })
+                .collect()
+        }
+        let mut context = ExecutionContext::new(self, inputs);
         let branch = node.execute(&mut context);
         self.advance(branch);
     }
@@ -139,16 +152,11 @@ impl Executor {
 pub struct ExecutionContext<'a> {
     executor: &'a mut Executor,
     inputs: Vec<InputSocket>,
-    cast: bool,
 }
 
 impl<'a> ExecutionContext<'a> {
-    fn new(executor: &'a mut Executor, inputs: Vec<InputSocket>, cast: bool) -> Self {
-        Self {
-            executor,
-            inputs,
-            cast,
-        }
+    fn new(executor: &'a mut Executor, inputs: Vec<InputSocket>) -> Self {
+        Self { executor, inputs }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
     pub fn execute_subroutine(&mut self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
@@ -161,22 +169,18 @@ impl<'a> ExecutionContext<'a> {
     }
 
     pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
-        if self.cast {
-            self.executor
-                .get_node_inputs()
-                .into_iter()
-                .zip(self.inputs.iter())
-                .map(|(iv, ec)| {
-                    if iv.class() != ec.class && ec.class.name != "any" {
-                        iv.cast_to(&ec.class)
-                    } else {
-                        iv
-                    }
-                })
-                .collect()
-        } else {
-            self.executor.get_node_inputs()
-        }
+        self.executor
+            .get_node_inputs()
+            .into_iter()
+            .zip(self.inputs.iter())
+            .map(|(iv, ec)| {
+                if iv.class() != ec.class && ec.class.name != "any" {
+                    iv.cast_to(&ec.class)
+                } else {
+                    iv
+                }
+            })
+            .collect()
     }
 
     pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
