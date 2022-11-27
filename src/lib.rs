@@ -56,13 +56,9 @@ impl Executor {
 
     pub fn execute_step(&mut self) {
         let node_id = self.current_node();
-        let inputs = self.get_node_inputs();
         let node = self.get_node_by_id(node_id);
-        let mut context = ExecutionContext::new(self, inputs);
+        let mut context = ExecutionContext::new(self);
         let branch = node.execute(&mut context);
-        if let Some(node_outputs) = context.node_outputs {
-            self.set_node_outputs(node_outputs)
-        }
         self.advance(branch);
     }
 
@@ -137,16 +133,12 @@ impl Executor {
 /// through this context.
 pub struct ExecutionContext<'a> {
     executor: &'a mut Executor,
-    node_inputs: Vec<Rc<dyn Object>>,
-    node_outputs: Option<Vec<Rc<dyn Object>>>,
 }
 
 impl<'a> ExecutionContext<'a> {
-    fn new(executor: &'a mut Executor, node_inputs: Vec<Rc<dyn Object>>) -> Self {
+    fn new(executor: &'a mut Executor) -> Self {
         Self {
             executor,
-            node_inputs,
-            node_outputs: None,
         }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
@@ -160,10 +152,10 @@ impl<'a> ExecutionContext<'a> {
     }
 
     pub fn get_inputs(&self) -> Vec<Rc<dyn Object>> {
-        self.node_inputs.clone()
+        self.executor.get_node_inputs()
     }
 
     pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.node_outputs = Some(values)
+        self.executor.set_node_outputs(values)
     }
 }
