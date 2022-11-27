@@ -167,7 +167,7 @@ impl<'a> ExecutionContext<'a> {
                 .into_iter()
                 .zip(self.inputs.iter())
                 .map(|(iv, ec)| {
-                    if iv.class() != ec.class {
+                    if iv.class() != ec.class && ec.class.name != "any" {
                         iv.cast_to(&ec.class)
                     } else {
                         iv
