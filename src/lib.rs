@@ -3,7 +3,7 @@ use module::ModulePath;
 use node::{AbsoluteNodeId, Node};
 use object::Object;
 use program::{LoadedProgramData, Program, ProgramCollection};
-use socket::{InputSocket, OutputSocket};
+use socket::InputSocket;
 use std::{collections::HashMap, fmt::Debug, rc::Rc, str::FromStr};
 
 pub mod class;
