@@ -50,4 +50,12 @@ pub trait Object: Display + Debug + ObjectFromStr {
     fn set_field(&mut self, _field: Rc<dyn Object>, _value: Rc<dyn Object>) {
         unimplemented!()
     }
+
+    fn cast_to(&self, to: &Class) -> Rc<dyn Object> {
+        if self.class().name == "any" {
+            (to.obj_from_str.unwrap())(&self.as_string()).unwrap()
+        } else {
+            unimplemented!()
+        }
+    }
 }
