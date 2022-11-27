@@ -157,7 +157,13 @@ impl<'a> ExecutionContext<'a> {
             .get_node_inputs()
             .into_iter()
             .zip(self.inputs.iter())
-            .map(|(iv, ec)| iv.cast_to(&ec.class))
+            .map(|(iv, ec)| {
+                if iv.class() != ec.class {
+                    iv.cast_to(&ec.class)
+                } else {
+                    iv
+                }
+            })
             .collect()
     }
 
