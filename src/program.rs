@@ -221,12 +221,18 @@ pub struct ProgramCollection {
 /// A program that contains nodes, classes, constant objects, etc.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Program {
+    /// What programs to load for this program to work
     pub imports: Option<Vec<String>>,
+    /// Collection of all nodes placed in the program
     pub nodes: HashMap<NodeId, NodeInfo>,
     /// Used for setting the position in a graphical view of the program. Third value is z-index.
     pub node_positions: Option<HashMap<NodeId, (f32, f32, f32)>>,
+    /// All classes defined in a program
     pub classes: Vec<ProtoClass>,
+    /// Execution order connections between nodes
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
+    /// Data connections between nodes
     pub connections: HashSet<Connection>,
+    /// COnstant inputs that are not getting a value through a connection
     pub const_inputs: HashMap<InputSocketId, String>,
 }
