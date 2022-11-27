@@ -137,9 +137,7 @@ pub struct ExecutionContext<'a> {
 
 impl<'a> ExecutionContext<'a> {
     fn new(executor: &'a mut Executor) -> Self {
-        Self {
-            executor,
-        }
+        Self { executor }
     }
     /// Redirect execution to a subroutine. Returns whatever end node receives.
     pub fn execute_subroutine(&mut self, start: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
