@@ -223,6 +223,8 @@ pub struct ProgramCollection {
 pub struct Program {
     pub imports: Option<Vec<String>>,
     pub nodes: HashMap<NodeId, NodeInfo>,
+    /// Used for setting the position in a graphical view of the program. Third value is z-index.
+    pub node_positions: Option<HashMap<NodeId, (f32, f32, f32)>>,
     pub classes: Vec<ProtoClass>,
     pub branch_edges: HashMap<NodeBranchId, NodeId>,
     pub connections: HashSet<Connection>,
