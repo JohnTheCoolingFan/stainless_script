@@ -59,6 +59,8 @@ impl Executor {
         let node_id = self.current_node();
         let node = self.get_node_by_id(node_id);
         let inputs = node.inputs();
+        // Possible solution so casts work through subroutine calls: put input sockets into
+        // execution context and fetch them before creation of the context
         let cast = !inputs[0].class.name.starts_with("subroutine_input@");
         let mut context = ExecutionContext::new(self, inputs, cast);
         let branch = node.execute(&mut context);
