@@ -219,7 +219,7 @@ pub struct ProgramCollection {
 }
 
 /// A program that contains nodes, classes, constant objects, etc.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Program {
     pub imports: Option<Vec<String>>,
     pub nodes: HashMap<NodeId, NodeInfo>,
