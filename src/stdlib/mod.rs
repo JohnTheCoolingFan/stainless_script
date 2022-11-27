@@ -1,3 +1,6 @@
+use crate::{class::Class, module::ModulePath, Plugin};
+use std::collections::HashMap;
+
 mod any_type;
 mod array_type;
 mod bool_type;
@@ -19,3 +22,26 @@ pub use number_type::*;
 pub use print_node::*;
 pub use string_type::*;
 pub use subroutine::*;
+
+pub struct StdPlugin;
+
+impl Plugin for StdPlugin {
+    fn classes(&self) -> HashMap<ModulePath, Class> {
+        [
+            any_class(),
+            array_class(),
+            bool_class(),
+            start_node_class(),
+            end_node_class(),
+            if_node_class(),
+            nop_node_class(),
+            number_class(),
+            print_class(),
+            string_class(),
+            subroutine_class(),
+        ]
+        .into_iter()
+        .map(|cl| (ModulePath(vec!["std".into()], cl.name.clone()), cl))
+        .collect()
+    }
+}
