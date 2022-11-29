@@ -48,7 +48,8 @@ impl Executor {
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.loaded.set_outputs(&self.current_node().cloned().unwrap(), values)
+        self.loaded
+            .set_outputs(&self.current_node().cloned().unwrap(), values)
     }
 
     fn current_node(&self) -> Option<&AbsoluteNodeId> {
@@ -81,7 +82,15 @@ impl Executor {
     }
 
     fn get_node_by_id(&self, node_id: Option<&AbsoluteNodeId>) -> Rc<dyn Node> {
-        self.loaded.get_node(node_id.unwrap()).unwrap()
+        node_id
+            .map(|id| self.loaded.get_node(id).unwrap())
+            .unwrap_or_else(|| {
+                self.loaded
+                    .get_class(ModulePath(vec!["std".into()], "end".into()))
+                    .unwrap()
+                    .nodes[0]
+                    .clone_node()
+            })
     }
 
     fn advance(&mut self, branch: usize) {

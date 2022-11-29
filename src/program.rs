@@ -210,6 +210,10 @@ impl LoadedProgramData {
     pub fn get_inputs(&self, node_id: &AbsoluteNodeId) -> Vec<Option<Rc<dyn Object>>> {
         self.programs.get(&node_id.0).unwrap().get_inputs(node_id.1)
     }
+
+    pub fn get_class(&self, path: ModulePath) -> Option<&Class> {
+        self.modules.get_class(&path)
+    }
 }
 
 /// Collection of programs loaded into an executor
