@@ -22,7 +22,7 @@ pub trait Plugin {
 /// `load_program`, start execution with `start_execution`, execute step-by-step with `execute_step` (will advance automatically)
 #[derive(Debug, Clone, Default)]
 pub struct Executor {
-    node_stack: Vec<AbsoluteNodeId>,
+    node_stack: Vec<Option<AbsoluteNodeId>>,
     loaded: LoadedProgramData,
     auto_execution: bool,
     stop_point: Option<AbsoluteNodeId>,
@@ -30,7 +30,7 @@ pub struct Executor {
 
 impl Executor {
     fn execute_subroutine(&mut self, node_id: AbsoluteNodeId, input_values: Vec<Rc<dyn Object>>) {
-        self.node_stack.push(node_id);
+        self.node_stack.push(Some(node_id));
         self.set_node_outputs(input_values);
     }
 
@@ -41,18 +41,18 @@ impl Executor {
 
     fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
         self.loaded
-            .get_inputs(&self.current_node())
+            .get_inputs(self.current_node())
             .into_iter()
             .collect::<Option<Vec<Rc<dyn Object>>>>()
             .unwrap()
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.loaded.set_outputs(&self.current_node(), values)
+        self.loaded.set_outputs(&self.current_node().clone(), values)
     }
 
-    fn current_node(&self) -> AbsoluteNodeId {
-        self.node_stack.last().unwrap().clone()
+    fn current_node(&self) -> &AbsoluteNodeId {
+        self.node_stack.last().unwrap().as_ref().unwrap()
     }
 
     pub fn execute_step(&mut self) {
@@ -68,7 +68,7 @@ impl Executor {
                     .unwrap(),
             )
             .unwrap();
-            let real_node = self.get_node_by_id(id);
+            let real_node = self.get_node_by_id(&id);
             inputs = real_node
                 .outputs()
                 .into_iter()
@@ -80,18 +80,18 @@ impl Executor {
         self.advance(branch);
     }
 
-    fn get_node_by_id(&self, node_id: AbsoluteNodeId) -> Rc<dyn Node> {
-        self.loaded.get_node(&node_id).unwrap()
+    fn get_node_by_id(&self, node_id: &AbsoluteNodeId) -> Rc<dyn Node> {
+        self.loaded.get_node(node_id).unwrap()
     }
 
     fn advance(&mut self, branch: usize) {
-        let node_id = self.node_stack.pop().unwrap();
-        let next_node_id = self.get_next_node(node_id, branch);
+        let node_id = self.node_stack.pop().unwrap().unwrap();
+        let next_node_id = self.get_next_node(&node_id, branch);
         self.node_stack.push(next_node_id)
     }
 
-    fn get_next_node(&self, current: AbsoluteNodeId, branch: usize) -> AbsoluteNodeId {
-        self.loaded.get_next_node(&current, branch).unwrap()
+    fn get_next_node(&self, current: &AbsoluteNodeId, branch: usize) -> Option<AbsoluteNodeId> {
+        self.loaded.get_next_node(current, branch)
     }
 
     pub fn load_program(&mut self, program: Program, path: ModulePath) {
@@ -111,7 +111,7 @@ impl Executor {
         let start_node = self
             .loaded
             .get_start_node(ModulePath(vec![], "__main__".into()), "main");
-        self.node_stack.push(start_node.unwrap());
+        self.node_stack.push(Some(start_node.unwrap()));
         self.execution_loop();
     }
 
@@ -119,7 +119,7 @@ impl Executor {
         while !self.node_stack.is_empty() && self.auto_execution {
             self.execute_step();
             if let Some(node) = &self.stop_point {
-                if &self.current_node() == node {
+                if self.current_node() == node {
                     self.auto_execution = false
                 }
             }
