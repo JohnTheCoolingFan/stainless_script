@@ -41,18 +41,18 @@ impl Executor {
 
     fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
         self.loaded
-            .get_inputs(self.current_node())
+            .get_inputs(self.current_node().unwrap())
             .into_iter()
             .collect::<Option<Vec<Rc<dyn Object>>>>()
             .unwrap()
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.loaded.set_outputs(&self.current_node().clone(), values)
+        self.loaded.set_outputs(&self.current_node().cloned().unwrap(), values)
     }
 
-    fn current_node(&self) -> &AbsoluteNodeId {
-        self.node_stack.last().unwrap().as_ref().unwrap()
+    fn current_node(&self) -> Option<&AbsoluteNodeId> {
+        self.node_stack.last().unwrap().as_ref()
     }
 
     pub fn execute_step(&mut self) {
@@ -68,7 +68,7 @@ impl Executor {
                     .unwrap(),
             )
             .unwrap();
-            let real_node = self.get_node_by_id(&id);
+            let real_node = self.get_node_by_id(Some(&id));
             inputs = real_node
                 .outputs()
                 .into_iter()
@@ -80,8 +80,8 @@ impl Executor {
         self.advance(branch);
     }
 
-    fn get_node_by_id(&self, node_id: &AbsoluteNodeId) -> Rc<dyn Node> {
-        self.loaded.get_node(node_id).unwrap()
+    fn get_node_by_id(&self, node_id: Option<&AbsoluteNodeId>) -> Rc<dyn Node> {
+        self.loaded.get_node(node_id.unwrap()).unwrap()
     }
 
     fn advance(&mut self, branch: usize) {
@@ -119,7 +119,7 @@ impl Executor {
         while !self.node_stack.is_empty() && self.auto_execution {
             self.execute_step();
             if let Some(node) = &self.stop_point {
-                if self.current_node() == node {
+                if self.current_node() == Some(node) {
                     self.auto_execution = false
                 }
             }
