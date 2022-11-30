@@ -4,10 +4,14 @@ use clap::Parser;
 use ron::de::from_reader as ron_from_reader;
 #[cfg(feature = "format-json")]
 use serde_json::from_reader as json_from_reader;
-use stainless_script::program::Program;
+use stainless_script::{
+    module::ModulePath,
+    program::{Program, ProgramCollection},
+};
 use std::{
     fs::File,
     path::{Path, PathBuf},
+    str::FromStr,
 };
 
 const LINUX_LIB_PATH: &str = "/usr/lib/stainless_script/";
@@ -74,6 +78,31 @@ fn read_program(path: &Path, format: &ProgramFormat) -> Program {
     }
 }
 
+fn read_imports(program: &Program, programs: &mut ProgramCollection) {
+    if let Some(imports) = &program.imports {
+        for import in imports {
+            let imported_program = read_import(import);
+            read_imports(&imported_program, programs);
+            programs
+                .programs
+                .insert(ModulePath::from_str(import).unwrap(), imported_program);
+        }
+    }
+}
+
+fn read_import(name: &str) -> Program {
+    let path = ModulePath::from_str(name).unwrap();
+    let fs_path = PathBuf::from(LINUX_LIB_PATH).join(PathBuf::from_iter(path.0.iter()));
+    let mut candidates =
+        glob::glob(&format!("{}/{}.*.ssc", fs_path.to_str().unwrap(), path.1)).unwrap();
+    let program_path = candidates
+        .next()
+        .unwrap_or_else(|| panic!("Failed to find import for `{}`", name))
+        .unwrap();
+    let format = format_from_filename(program_path.file_name().unwrap().to_str().unwrap());
+    read_program(&program_path, &format)
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -82,5 +111,13 @@ fn main() {
         format_from_filename(file_name)
     });
 
-    let program = read_program(&cli.program, &program_format);
+    let main_program = read_program(&cli.program, &program_format);
+
+    let mut programs = ProgramCollection::default();
+
+    read_imports(&main_program, &mut programs);
+
+    programs
+        .programs
+        .insert(ModulePath(vec![], "__main__".into()), main_program);
 }
