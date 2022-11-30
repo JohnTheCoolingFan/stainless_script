@@ -5,7 +5,10 @@ use ron::de::from_reader as ron_from_reader;
 #[cfg(feature = "format-json")]
 use serde_json::from_reader as json_from_reader;
 use stainless_script::program::Program;
-use std::{fs::File, path::{PathBuf, Path}};
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 const LINUX_LIB_PATH: &str = "/usr/lib/stainless_script/";
 
