@@ -40,41 +40,49 @@ impl Executor {
     }
 
     fn get_node_inputs(&self) -> Vec<Rc<dyn Object>> {
-        self.loaded
-            .get_inputs(self.current_node().unwrap())
-            .into_iter()
-            .collect::<Option<Vec<Rc<dyn Object>>>>()
-            .unwrap()
+        if let Some(current_node) = self.current_node() {
+            self.loaded
+                .get_inputs(current_node)
+                .into_iter()
+                .collect::<Option<Vec<Rc<dyn Object>>>>()
+                .unwrap()
+        } else {
+            vec![]
+        }
     }
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
-        self.loaded
-            .set_outputs(&self.current_node().cloned().unwrap(), values)
+        if let Some(current_node) = self.current_node() {
+            self.loaded
+                .set_outputs(&current_node.clone(), values)
+        }
     }
 
     fn current_node(&self) -> Option<&AbsoluteNodeId> {
-        self.node_stack.last().unwrap().as_ref()
+        self.node_stack.last()?.as_ref()
     }
 
     pub fn execute_step(&mut self) {
         let node_id = self.current_node();
         let node = self.get_node_by_id(node_id);
         let mut inputs = node.inputs();
-        if inputs[0].class.name.starts_with("subroutine_input@") {
-            let id = AbsoluteNodeId::from_str(
-                inputs[0]
-                    .class
-                    .name
-                    .strip_prefix("subroutine_input@")
-                    .unwrap(),
-            )
-            .unwrap();
-            let real_node = self.get_node_by_id(Some(&id));
-            inputs = real_node
-                .outputs()
-                .into_iter()
-                .map(|os| InputSocket { class: os.class })
-                .collect()
+        if let Some(input) = inputs.get(0) {
+            if input.class.name.starts_with("subroutine_input@") {
+                let id = AbsoluteNodeId::from_str(
+                    inputs[0]
+                        .class
+                        .name
+                        .strip_prefix("subroutine_input@")
+                        .unwrap(),
+                )
+                .unwrap();
+                let real_node = self.get_node_by_id(Some(&id));
+                inputs = real_node
+                    .outputs()
+                    .into_iter()
+                    .map(|os| InputSocket { class: os.class })
+                    .collect()
+            }
         }
         let mut context = ExecutionContext::new(self, inputs);
         let branch = node.execute(&mut context);
@@ -94,9 +102,11 @@ impl Executor {
     }
 
     fn advance(&mut self, branch: usize) {
-        let node_id = self.node_stack.pop().unwrap().unwrap();
-        let next_node_id = self.get_next_node(&node_id, branch);
-        self.node_stack.push(next_node_id)
+        if let Some(current_node_id) = self.node_stack.pop() {
+            let node_id = current_node_id.unwrap();
+            let next_node_id = self.get_next_node(&node_id, branch);
+            self.node_stack.push(next_node_id)
+        }
     }
 
     fn get_next_node(&self, current: &AbsoluteNodeId, branch: usize) -> Option<AbsoluteNodeId> {

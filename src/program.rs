@@ -122,9 +122,10 @@ impl LoadedProgram {
             }))
             .collect();
         let mut result: Vec<Option<Rc<dyn Object>>> = Vec::with_capacity(connections.keys().len());
-        for i in 0..=connections.iter().map(|(c, _)| *c).max().unwrap() {
+        for i in 0..=connections.iter().map(|(c, _)| *c).max().unwrap_or(0) {
             result.push(connections.get(&i).cloned())
         }
+        dbg!(&result);
         result
     }
 }
