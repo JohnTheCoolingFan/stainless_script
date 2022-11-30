@@ -21,4 +21,4 @@ clap = { version = "4.0", optional = true, features = ["derive"] }
 
 [[bin]]
 name = "ssce"
-required_features = ["executor-binary"]
+required-features = ["executor-binary"]
