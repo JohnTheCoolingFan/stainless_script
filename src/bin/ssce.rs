@@ -6,7 +6,9 @@ use ron::de::from_reader as ron_from_reader;
 use serde_json::from_reader as json_from_reader;
 use stainless_script::{
     module::ModulePath,
-    program::{Program, ProgramCollection}, Executor, stdlib::StdPlugin,
+    program::{Program, ProgramCollection},
+    stdlib::StdPlugin,
+    Executor,
 };
 use std::{
     fs::File,
@@ -50,7 +52,7 @@ impl From<String> for ProgramFormat {
 
 fn format_from_filename(file_name: &str) -> ProgramFormat {
     if file_name.ends_with(".ron.ssc") {
-        return ProgramFormat::Ron
+        return ProgramFormat::Ron;
     }
     #[cfg(feature = "format-json")]
     if file_name.ends_with(".json.ssc") {
@@ -82,7 +84,8 @@ fn read_imports(program: &Program, programs: &mut ProgramCollection) {
             read_imports(&imported_program, programs);
             programs
                 .programs
-                .insert(ModulePath::from_str(import).unwrap(), imported_program);
+                .entry(ModulePath::from_str(import).unwrap())
+                .or_insert(imported_program);
         }
     }
 }
@@ -119,6 +122,7 @@ fn main() {
         .insert(ModulePath(vec![], "__main__".into()), main_program);
 
     let mut executor = Executor::default();
+
     // ADD PLUGINS HERE
     executor.load_plugin(StdPlugin);
 
