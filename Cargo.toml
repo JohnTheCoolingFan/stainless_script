@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["format-json", "format-bincode"]
-format-json = ["serde_json"]
-format-bincode = ["bincode"]
+default = ["executor-binary", "format-json", "format-bincode"]
+executor-binary = []
+format-json = ["serde_json", "executor-binary"]
+format-bincode = ["bincode", "executor-binary"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -19,3 +20,4 @@ ron = "0.8"
 
 [[bin]]
 name = "ssce"
+required_features = ["executor-binary"]
