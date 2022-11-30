@@ -6,7 +6,7 @@ use ron::de::from_reader as ron_from_reader;
 use serde_json::from_reader as json_from_reader;
 use stainless_script::{
     module::ModulePath,
-    program::{Program, ProgramCollection},
+    program::{Program, ProgramCollection}, Executor, stdlib::StdPlugin,
 };
 use std::{
     fs::File,
@@ -120,4 +120,12 @@ fn main() {
     programs
         .programs
         .insert(ModulePath(vec![], "__main__".into()), main_program);
+
+    let mut executor = Executor::default();
+    // ADD PLUGINS HERE
+    executor.load_plugin(StdPlugin);
+
+    executor.load_programs(programs);
+
+    executor.start_execution(true);
 }
