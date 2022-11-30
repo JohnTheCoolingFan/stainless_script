@@ -48,9 +48,16 @@ fn format_from_filename(file_name: &str) -> ProgramFormat {
     if file_name.ends_with(".ron.ssc") {
         ProgramFormat::Ron
     } else if cfg!(feature = "format-json") && file_name.ends_with(".json.ssc") {
-        ProgramFormat::Json
+        // These cfgs are a mess but it's a required workaround to make this compile
+        #[cfg(feature = "format-json")]
+        return ProgramFormat::Json;
+        #[cfg(not(feature = "format-json"))]
+        panic!("Failed to determine program format based on file extension, please specify program format using --format")
     } else if cfg!(feature = "format-bincode") && file_name.ends_with(".bin.ssc") {
-        ProgramFormat::Bincode
+        #[cfg(feature = "format-bincode")]
+        return ProgramFormat::Bincode;
+        #[cfg(not(feature = "format-bincode"))]
+        panic!("Failed to determine program format based on file extension, please specify program format using --format")
     } else {
         panic!("Failed to determine program format based on file extension, please specify program format using --format")
     }
