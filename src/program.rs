@@ -125,7 +125,6 @@ impl LoadedProgram {
         for i in 0..=connections.iter().map(|(c, _)| *c).max().unwrap_or(0) {
             result.push(connections.get(&i).cloned())
         }
-        dbg!(&result);
         result
     }
 }
