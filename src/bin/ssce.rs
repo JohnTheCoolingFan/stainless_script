@@ -50,21 +50,18 @@ impl From<String> for ProgramFormat {
 
 fn format_from_filename(file_name: &str) -> ProgramFormat {
     if file_name.ends_with(".ron.ssc") {
-        ProgramFormat::Ron
-    } else if cfg!(feature = "format-json") && file_name.ends_with(".json.ssc") {
-        // These cfgs are a mess but it's a required workaround to make this compile
-        #[cfg(feature = "format-json")]
-        return ProgramFormat::Json;
-        #[cfg(not(feature = "format-json"))]
-        panic!("Failed to determine program format based on file extension, please specify program format using --format")
-    } else if cfg!(feature = "format-bincode") && file_name.ends_with(".bin.ssc") {
-        #[cfg(feature = "format-bincode")]
-        return ProgramFormat::Bincode;
-        #[cfg(not(feature = "format-bincode"))]
-        panic!("Failed to determine program format based on file extension, please specify program format using --format")
-    } else {
-        panic!("Failed to determine program format based on file extension, please specify program format using --format")
+        return ProgramFormat::Ron
     }
+    #[cfg(feature = "format-json")]
+    if file_name.ends_with(".json.ssc") {
+        // These cfgs are a mess but it's a required workaround to make this compile
+        return ProgramFormat::Json;
+    }
+    #[cfg(feature = "format-bincode")]
+    if file_name.ends_with(".bin.ssc") {
+        return ProgramFormat::Bincode;
+    }
+    panic!("Failed to determine program format based on file extension, please specify program format using --format")
 }
 
 fn read_program(path: &Path, format: &ProgramFormat) -> Program {
