@@ -12,6 +12,7 @@ Features (all enabled by default):
 - `executor-binary` - Build executor binary
 - `format-json` - Enable support for json program format (`.json.ssc`)
 - `format-bincode` - Enable support for bincode program format (`.bin.ssc`)
+
 The [ron](https://crates.io/crates/ron) program format (`.ron.ssc`) is always enabled as ron is also used as a standard for defining objects.
 
 Executor binary can be installed from crates.io:
