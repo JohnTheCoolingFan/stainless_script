@@ -2,6 +2,12 @@
 name = "stainless_script"
 version = "0.1.0"
 edition = "2021"
+description = "Visual node-based programming language"
+license = "BSD-3-Clause"
+repository = "https://github.com/JohnTheCoolingFan/stainless_script"
+categpries = ["compilers"]
+documentation = "https://docs.rs/stainless_script"
+authors = ["Jonh The Cooling Fan <ivan8215145640@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
