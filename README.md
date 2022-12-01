@@ -2,11 +2,24 @@
 
 Stainless Script is a visual node-based programming language.
 
-The structure is as follows: program contains classes and objects (constants). Class desribes a data type and its associated methods, which are nodes and their variations. Nodes are executed one-by-one in sequence. Additionally, data can be passed from one node to other using connections that carry Objects. Node can specify what Class are the objects it outputs or inputs.
+The structure is as follows: program contains classes, objects (constants) and nodes and their connections. Class desribes a data type and its associated methods, which are nodes and their variations. Nodes are executed one-by-one in sequence. Additionally, data can be passed from one node to other using connections that carry Objects. Node can specify what Class are the objects it outputs or inputs.
 
-This repo contains basic data structures and logic for executing the code, as well as an executor binary that can be modified to add native rust modules by forking the repo.
+This repo contains basic data structures and logic for executing the code, as well as an executor binary (build instructions below) that can be modified to add native rust modules by forking the repo.
 
-For building the executor, use the following command:
+You can opt-out of the executor binary and its format features. To do so, set `default_features = false`.
+
+Features (all enabled by default):
+- `executor-binary` - Build executor binary
+- `format-json` - Enable support for json program format (`.json.ssc`)
+- `format-bincode` - Enable support for bincode program format (`.bin.ssc`)
+The ron program format (`.ron.ssc`) is always enabled as ron is also used as a standard for defining objects.
+
+Executor binary can be installed from crates.io:
+```
+cargo install stainless_script
+```
+
+For manually building the executor, use the following command:
 ```
 cargo build --release --bin ssce
 ```
