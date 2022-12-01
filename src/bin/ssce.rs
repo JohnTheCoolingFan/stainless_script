@@ -19,7 +19,7 @@ use std::{
 const LINUX_LIB_PATH: &str = "/usr/lib/stainless_script/";
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = Some(concat!("Visual node-based programming language\n\n", include_str!("../../LICENSE"))))]
 struct Cli {
     program: PathBuf,
 
