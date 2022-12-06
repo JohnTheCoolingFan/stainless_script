@@ -72,20 +72,20 @@ impl Module {
     pub fn get_class(&self, path: &ModulePath) -> Option<&Class> {
         let mut current_segment = &self.items;
         for segment in &path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.get(segment).unwrap() else { return None};
+            let ModuleItem::Module(next_segment) = current_segment.get(segment)? else { return None};
             current_segment = &next_segment.items;
         }
-        let ModuleItem::Class(class) = current_segment.get(&path.1).unwrap() else {return None};
+        let ModuleItem::Class(class) = current_segment.get(&path.1)? else {return None};
         Some(class)
     }
 
     pub fn get_class_mut(&mut self, path: &ModulePath) -> Option<&mut Class> {
         let mut current_segment = &mut self.items;
         for segment in &path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.get_mut(segment).unwrap() else {return None};
+            let ModuleItem::Module(next_segment) = current_segment.get_mut(segment)? else {return None};
             current_segment = &mut next_segment.items;
         }
-        let ModuleItem::Class(class) = current_segment.get_mut(&path.1).unwrap() else {return None};
+        let ModuleItem::Class(class) = current_segment.get_mut(&path.1)? else {return None};
         Some(class)
     }
 }
