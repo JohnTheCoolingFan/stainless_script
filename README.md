@@ -6,6 +6,10 @@ The structure is as follows: program contains classes, objects (constants) and n
 
 This repo contains basic data structures and logic for executing the code, as well as an executor binary (build instructions below) that can be modified to add native rust modules by forking the repo.
 
+# Example programs
+
+Example programs are located in `example_programs` directory. Currently there are only hello world programs in all three supported formats. They can be executed with the executor binary.
+
 # Planned features
 
 - Dictionaries

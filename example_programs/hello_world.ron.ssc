@@ -1,0 +1,1 @@
+(imports:None,nodes:{1:(class:["std","print"],idx:0,variant:"println"),0:(class:["std","start"],idx:0,variant:"start#main#[]")},node_positions:None,classes:[],branch_edges:{0:1},connections:[],const_inputs:{(4294967296):"Hello, world!"})

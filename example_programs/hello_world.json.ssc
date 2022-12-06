@@ -1,0 +1,1 @@
+{"imports":null,"nodes":{"0":{"class":["std","start"],"idx":0,"variant":"start#main#[]"},"1":{"class":["std","print"],"idx":0,"variant":"println"}},"node_positions":null,"classes":[],"branch_edges":{"0":1},"connections":[],"const_inputs":{"4294967296":"Hello, world!"}}
