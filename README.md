@@ -6,6 +6,13 @@ The structure is as follows: program contains classes, objects (constants) and n
 
 This repo contains basic data structures and logic for executing the code, as well as an executor binary (build instructions below) that can be modified to add native rust modules by forking the repo.
 
+# Planned features
+
+- Dictionaries
+- Program-defined objects
+
+# Executor
+
 You can opt-out of the executor binary and its format features. To do so, set `default_features = false`.
 
 Features (all enabled by default):
