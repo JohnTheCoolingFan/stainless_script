@@ -118,7 +118,7 @@ impl LoadedProgram {
             .chain(self.const_inputs.iter().filter_map(|(s, v)| {
                 let inputs = self.get_node(node_id).unwrap().inputs();
                 let class = &inputs.get(s.0 .1)?.class;
-                (s.0 .0 == node_id).then(|| (s.0 .1, class.obj_from_str.unwrap()(v).unwrap()))
+                (s.0 .0 == node_id).then(|| (s.0 .1, class.obj_from_str.expect("Class does not have object from str conversion in const input")(v).unwrap()))
             }))
             .collect();
         let mut result: Vec<Option<Rc<dyn Object>>> = Vec::with_capacity(connections.keys().len());
