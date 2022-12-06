@@ -63,7 +63,7 @@ impl Module {
     pub fn insert(&mut self, path: ModulePath, item: impl Into<ModuleItem>) -> &mut ModuleItem {
         let mut current_segment = &mut self.items;
         for segment in path.0 {
-            let ModuleItem::Module(next_segment) = current_segment.entry(segment.clone()).or_insert_with(|| ModuleItem::Module(Module::default())) else {unreachable!()};
+            let ModuleItem::Module(next_segment) = current_segment.entry(segment.clone()).or_insert_with(|| ModuleItem::Module(Module::default())) else {panic!("Attempt to index non-module item.")};
             current_segment = &mut next_segment.items;
         }
         current_segment.entry(path.1).or_insert_with(|| item.into())
