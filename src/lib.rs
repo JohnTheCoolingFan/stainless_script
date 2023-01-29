@@ -26,6 +26,7 @@ pub struct Executor {
     loaded: LoadedProgramData,
     auto_execution: bool,
     stop_point: Option<AbsoluteNodeId>,
+    variables: HashMap<String, Rc<dyn Object>>,
 }
 
 impl Executor {
@@ -53,8 +54,7 @@ impl Executor {
 
     fn set_node_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
         if let Some(current_node) = self.current_node() {
-            self.loaded
-                .set_outputs(&current_node.clone(), values)
+            self.loaded.set_outputs(&current_node.clone(), values)
         }
     }
 
@@ -162,7 +162,16 @@ impl Executor {
             loaded,
             auto_execution: bool::default(),
             stop_point: None,
+            variables: HashMap::default(),
         }
+    }
+
+    pub fn set_variable(&mut self, name: &str, val: Rc<dyn Object>) {
+        self.variables.insert(name.to_string(), val);
+    }
+
+    pub fn get_variable(&self, name: &str) -> Option<Rc<dyn Object>> {
+        Some(Rc::clone(self.variables.get(name)?))
     }
 }
 
@@ -204,5 +213,13 @@ impl<'a> ExecutionContext<'a> {
 
     pub fn set_outputs(&mut self, values: Vec<Rc<dyn Object>>) {
         self.executor.set_node_outputs(values)
+    }
+
+    pub fn set_variable(&mut self, name: &str, val: Rc<dyn Object>) {
+        self.executor.set_variable(name, val)
+    }
+
+    pub fn get_variable(&self, name: &str) -> Option<Rc<dyn Object>> {
+        self.executor.get_variable(name)
     }
 }
