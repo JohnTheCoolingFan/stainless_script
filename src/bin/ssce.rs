@@ -45,7 +45,7 @@ impl From<String> for ProgramFormat {
             "json" => Self::Json,
             #[cfg(feature = "format-bincode")]
             "bincode" => Self::Bincode,
-            _ => panic!("Invalid format: {}", s),
+            _ => panic!("Invalid format: {s}"),
         }
     }
 }
@@ -97,7 +97,7 @@ fn read_import(name: &str) -> Program {
         glob::glob(&format!("{}/{}.*.ssc", fs_path.to_str().unwrap(), path.1)).unwrap();
     let program_path = candidates
         .next()
-        .unwrap_or_else(|| panic!("Failed to find import for `{}`", name))
+        .unwrap_or_else(|| panic!("Failed to find import for `{name}`"))
         .unwrap();
     let format = format_from_filename(program_path.file_name().unwrap().to_str().unwrap());
     read_program(&program_path, &format)

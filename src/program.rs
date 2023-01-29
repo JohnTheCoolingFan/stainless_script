@@ -52,7 +52,7 @@ impl LoadedProgram {
                 parts.next();
                 let node_name = parts.next()?;
                 if node_name == name {
-                    return Some(*node_id)
+                    return Some(*node_id);
                 }
             }
         }
@@ -118,11 +118,19 @@ impl LoadedProgram {
             .chain(self.const_inputs.iter().filter_map(|(s, v)| {
                 let inputs = self.get_node(node_id).unwrap().inputs();
                 let class = &inputs.get(s.0 .1)?.class;
-                (s.0 .0 == node_id).then(|| (s.0 .1, class.obj_from_str.expect("Class does not have object from str conversion in const input")(v).unwrap()))
+                (s.0 .0 == node_id).then(|| {
+                    (
+                        s.0 .1,
+                        class.obj_from_str.expect(
+                            "Class does not have object from str conversion in const input",
+                        )(v)
+                        .unwrap(),
+                    )
+                })
             }))
             .collect();
         let mut result: Vec<Option<Rc<dyn Object>>> = Vec::with_capacity(connections.keys().len());
-        for i in 0..=connections.iter().map(|(c, _)| *c).max().unwrap_or(0) {
+        for i in 0..=connections.keys().copied().max().unwrap_or(0) {
             result.push(connections.get(&i).cloned())
         }
         result
@@ -190,7 +198,9 @@ impl LoadedProgramData {
 
     pub fn get_start_node(&self, program_id: ProgramId, name: &str) -> Option<AbsoluteNodeId> {
         let program = self.programs.get(&program_id)?;
-        program.get_start_node(name).map(|i| AbsoluteNodeId(program_id.clone(), i))
+        program
+            .get_start_node(name)
+            .map(|i| AbsoluteNodeId(program_id.clone(), i))
     }
 
     pub fn get_next_node(&self, node_id: &AbsoluteNodeId, branch: usize) -> Option<AbsoluteNodeId> {

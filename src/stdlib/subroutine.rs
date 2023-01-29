@@ -23,7 +23,7 @@ pub fn subroutine_class() -> Class {
 /// This is a special class that tells to look to the node id outputs provided in the class for inputs
 pub fn subroutine_input_class(id: &AbsoluteNodeId) -> Class {
     Class {
-        name: format!("subroutine_input@{}", id),
+        name: format!("subroutine_input@{id}"),
         nodes: vec![],
         obj_from_str: None,
     }
@@ -32,7 +32,7 @@ pub fn subroutine_input_class(id: &AbsoluteNodeId) -> Class {
 /// This is a special class that tells to look to the node id inputs provided in the class for outputs
 pub fn subroutine_output_class(id: &AbsoluteNodeId) -> Class {
     Class {
-        name: format!("subroutine_output@{}", id),
+        name: format!("subroutine_output@{id}"),
         nodes: vec![],
         obj_from_str: None,
     }

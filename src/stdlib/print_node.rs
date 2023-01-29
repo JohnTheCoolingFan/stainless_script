@@ -95,9 +95,9 @@ impl Node for Print {
             .collect::<Vec<String>>()
             .join(" ");
         if self.0.ln {
-            println!("{}", to_print);
+            println!("{to_print}");
         } else {
-            print!("{}", to_print);
+            print!("{to_print}");
         };
         0
     }
