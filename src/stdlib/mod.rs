@@ -11,6 +11,7 @@ mod number_type;
 mod print_node;
 mod string_type;
 mod subroutine;
+mod variable_node;
 
 pub use any_type::*;
 pub use array_type::*;
@@ -22,6 +23,7 @@ pub use number_type::*;
 pub use print_node::*;
 pub use string_type::*;
 pub use subroutine::*;
+pub use variable_node::*;
 
 pub struct StdPlugin;
 
@@ -39,6 +41,8 @@ impl Plugin for StdPlugin {
             print_class(),
             string_class(),
             subroutine_class(),
+            variable_get_class(),
+            variable_set_class(),
         ]
         .into_iter()
         .map(|cl| (ModulePath(vec!["std".into()], cl.name.clone()), cl))
