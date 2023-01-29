@@ -46,7 +46,12 @@ impl Node for StartNode {
     }
 
     fn current_variant(&self) -> std::borrow::Cow<'_, str> {
-        format!("start#{}#{}", self.name, ron::to_string(&self.outputs).unwrap()).into()
+        format!(
+            "start#{}#{}",
+            self.name,
+            ron::to_string(&self.outputs).unwrap()
+        )
+        .into()
     }
 
     fn set_variant(&mut self, variant: &str) {

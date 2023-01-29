@@ -13,7 +13,7 @@ impl From<&SocketId> for u64 {
 
 impl From<u64> for SocketId {
     fn from(n: u64) -> Self {
-        let (node_id, socket_idx) = ((n >>32) as u32, n as u32);
+        let (node_id, socket_idx) = ((n >> 32) as u32, n as u32);
         Self(node_id, socket_idx as usize)
     }
 }
