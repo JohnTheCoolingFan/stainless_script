@@ -3,6 +3,7 @@ use crate::{
     module::ModulePath,
     node::{AbsoluteNodeId, Node, NodeId},
     socket::{InputSocket, OutputSocket},
+    ExecutionContext,
 };
 use std::{borrow::Cow, rc::Rc, str::FromStr};
 
@@ -44,7 +45,7 @@ pub fn subroutine_output_class(id: &AbsoluteNodeId) -> Class {
 pub struct Subroutine(AbsoluteNodeId, AbsoluteNodeId);
 
 impl Node for Subroutine {
-    fn execute(&self, context: &mut crate::ExecutionContext) -> usize {
+    fn execute(&self, context: &mut ExecutionContext) -> usize {
         let inputs = context.get_inputs();
         context.execute_subroutine(self.0.clone(), inputs);
         0
