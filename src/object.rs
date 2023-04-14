@@ -61,7 +61,7 @@ pub trait ObjectPartialOrd {
 pub trait ObjectEq: ObjectPartialEq {}
 
 /// Stainless Script Object version of [`Ord`]
-pub trait ObjectOrd: ObjectEq + ObjectPartialOrd + Object {
+pub trait ObjectOrd: ObjectEq + ObjectPartialOrd {
     fn cmp(&self, other: Rc<dyn Object>) -> Ordering;
 }
 
