@@ -1,5 +1,6 @@
 use crate::class::Class;
 use std::{
+    cmp::Ordering,
     error::Error,
     fmt::{Debug, Display},
     rc::Rc,
@@ -7,7 +8,7 @@ use std::{
 };
 
 /// Types that implement FromStr should use their FromStr implementation. Other types should use
-/// ron (https://github.com/ron-rs/ron)
+/// ron (<https://github.com/ron-rs/ron>)
 pub trait ObjectFromStr {
     fn from_str(s: &str) -> Result<Rc<dyn Object>, Box<dyn Error + Send + Sync>>
     where
@@ -23,6 +24,45 @@ where
             .map_err(Into::into)
             .map(|o| Rc::new(o) as Rc<dyn Object>)
     }
+}
+
+/// Stainless Script Object version of [`PartialEq`]
+pub trait ObjectPartialEq {
+    fn eq(&self, other: Rc<dyn Object>) -> bool;
+    fn ne(&self, other: Rc<dyn Object>) -> bool {
+        !self.eq(other)
+    }
+}
+
+/// Stainless Script Object version of [`PartialOrd`]
+pub trait ObjectPartialOrd {
+    fn partial_cmp(&self, other: Rc<dyn Object>) -> Option<Ordering>;
+    fn lt(&self, other: Rc<dyn Object>) -> bool {
+        matches!(self.partial_cmp(other), Some(Ordering::Less))
+    }
+    fn le(&self, other: Rc<dyn Object>) -> bool {
+        matches!(
+            self.partial_cmp(other),
+            Some(Ordering::Less | Ordering::Equal)
+        )
+    }
+    fn gt(&self, other: Rc<dyn Object>) -> bool {
+        matches!(self.partial_cmp(other), Some(Ordering::Greater))
+    }
+    fn ge(&self, other: Rc<dyn Object>) -> bool {
+        matches!(
+            self.partial_cmp(other),
+            Some(Ordering::Greater | Ordering::Equal)
+        )
+    }
+}
+
+/// Stainless Script Object version of [`Eq`]
+pub trait ObjectEq: ObjectPartialEq {}
+
+/// Stainless Script Object version of [`Ord`]
+pub trait ObjectOrd: ObjectEq + ObjectPartialOrd + Object {
+    fn cmp(&self, other: Rc<dyn Object>) -> Ordering;
 }
 
 /// The object of a data type. Data type is derived from the object's class. Methods specified here
