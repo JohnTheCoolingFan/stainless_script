@@ -1,7 +1,7 @@
 use crate::{
     class::Class,
     node::Node,
-    object::{Object, ObjectFromStr},
+    object::{Object, ObjectEq, ObjectFromStr, ObjectOrd, ObjectPartialEq, ObjectPartialOrd},
     socket::{InputSocket, OutputSocket},
     ExecutionContext,
 };
@@ -35,6 +35,30 @@ impl Object for bool {
 
     fn as_bool(&self) -> bool {
         *self
+    }
+}
+
+impl ObjectPartialEq for bool {
+    fn eq(&self, other: Rc<dyn Object>) -> bool {
+        other.class() == self.class() && *self == other.as_bool()
+    }
+}
+
+impl ObjectPartialOrd for bool {
+    fn partial_cmp(&self, other: Rc<dyn Object>) -> Option<std::cmp::Ordering> {
+        if other.class() == self.class() {
+            PartialOrd::partial_cmp(self, &other.as_bool())
+        } else {
+            None
+        }
+    }
+}
+
+impl ObjectEq for bool {}
+
+impl ObjectOrd for bool {
+    fn cmp(&self, other: Rc<dyn Object>) -> std::cmp::Ordering {
+        ObjectPartialOrd::partial_cmp(self, other).unwrap()
     }
 }
 

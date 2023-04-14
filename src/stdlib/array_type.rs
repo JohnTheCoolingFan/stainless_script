@@ -2,10 +2,11 @@ use super::{any_class, number_class, AnyType};
 use crate::{
     class::Class,
     node::Node,
-    object::{Object, ObjectFromStr},
+    object::{Object, ObjectEq, ObjectFromStr, ObjectOrd, ObjectPartialEq, ObjectPartialOrd},
     socket::{InputSocket, OutputSocket},
     ExecutionContext,
 };
+use stainless_script_derive::{ObjectEq, ObjectOrd};
 use std::{fmt::Display, rc::Rc, str::FromStr};
 
 pub fn array_class() -> Class {
@@ -16,7 +17,7 @@ pub fn array_class() -> Class {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, ObjectEq, ObjectOrd)]
 pub struct Array(Vec<Rc<dyn Object>>);
 
 impl FromStr for Array {
@@ -78,6 +79,39 @@ impl Object for Array {
         if field.class() == number_class() {
             self.0[field.as_number() as usize] = value;
         }
+    }
+}
+
+impl ObjectPartialEq for Array {
+    fn eq(&self, other: Rc<dyn Object>) -> bool {
+        if other.class() == self.class() {
+            if other
+                .get_field(Rc::new("len".to_string()) as Rc<dyn Object>)
+                .as_number() as usize
+                == self.0.len()
+            {
+                let other = &other as &dyn std::any::Any;
+                if let Some(other) = other.downcast_ref::<Self>() {
+                    self.0
+                        .iter()
+                        .zip(other.0.iter())
+                        .all(|(l, r)| l.eq(Rc::clone(r)))
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl ObjectPartialOrd for Array {
+    /// UNIMPLEMENTED, WILL PANIC, DO NOT USE AS DICT KEY
+    fn partial_cmp(&self, _other: Rc<dyn Object>) -> Option<std::cmp::Ordering> {
+        todo!()
     }
 }
 

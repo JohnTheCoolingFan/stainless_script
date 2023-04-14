@@ -1,7 +1,7 @@
 use crate::{
     class::Class,
     node::Node,
-    object::{Object, ObjectFromStr},
+    object::{Object, ObjectEq, ObjectFromStr, ObjectOrd, ObjectPartialEq, ObjectPartialOrd},
     socket::{InputSocket, OutputSocket},
     ExecutionContext,
 };
@@ -28,6 +28,34 @@ impl Object for String {
 
     fn as_bool(&self) -> bool {
         !self.is_empty()
+    }
+}
+
+impl ObjectPartialEq for String {
+    fn eq(&self, other: Rc<dyn Object>) -> bool {
+        if self.class() == other.class() {
+            PartialEq::eq(self, &other.as_string())
+        } else {
+            false
+        }
+    }
+}
+
+impl ObjectPartialOrd for String {
+    fn partial_cmp(&self, other: Rc<dyn Object>) -> Option<std::cmp::Ordering> {
+        if self.class() == other.class() {
+            PartialOrd::partial_cmp(self, &other.as_string())
+        } else {
+            None
+        }
+    }
+}
+
+impl ObjectEq for String {}
+
+impl ObjectOrd for String {
+    fn cmp(&self, other: Rc<dyn Object>) -> std::cmp::Ordering {
+        ObjectPartialOrd::partial_cmp(self, other).unwrap()
     }
 }
 

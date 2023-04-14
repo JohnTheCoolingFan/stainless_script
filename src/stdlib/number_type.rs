@@ -1,7 +1,7 @@
 use crate::{
     class::Class,
     node::Node,
-    object::{Object, ObjectFromStr},
+    object::{Object, ObjectEq, ObjectFromStr, ObjectOrd, ObjectPartialEq, ObjectPartialOrd},
     socket::{InputSocket, OutputSocket},
     ExecutionContext,
 };
@@ -36,6 +36,34 @@ impl Object for f64 {
             "as_integer" => Rc::new(self - self.fract()) as Rc<dyn Object>,
             _ => panic!("Unknown field: {field}"),
         }
+    }
+}
+
+impl ObjectPartialEq for f64 {
+    fn eq(&self, other: Rc<dyn Object>) -> bool {
+        if other.class() == self.class() {
+            PartialEq::eq(self, &other.as_number())
+        } else {
+            false
+        }
+    }
+}
+
+impl ObjectPartialOrd for f64 {
+    fn partial_cmp(&self, other: Rc<dyn Object>) -> Option<std::cmp::Ordering> {
+        if other.class() == self.class() {
+            PartialOrd::partial_cmp(self, &other.as_number())
+        } else {
+            None
+        }
+    }
+}
+
+impl ObjectEq for f64 {}
+
+impl ObjectOrd for f64 {
+    fn cmp(&self, other: Rc<dyn Object>) -> std::cmp::Ordering {
+        ObjectPartialOrd::partial_cmp(self, other).unwrap()
     }
 }
 

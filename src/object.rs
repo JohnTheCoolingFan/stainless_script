@@ -67,7 +67,9 @@ pub trait ObjectOrd: ObjectEq + ObjectPartialOrd {
 
 /// The object of a data type. Data type is derived from the object's class. Methods specified here
 /// are for use in nodes mostly.
-pub trait Object: Display + Debug + ObjectFromStr {
+pub trait Object:
+    Display + Debug + ObjectFromStr + ObjectPartialEq + ObjectPartialOrd + ObjectEq + ObjectOrd
+{
     fn class(&self) -> Class;
     /// Since Object requires Display, this has little use and is implemented  through ToString,
     /// which is implemented for all types implementing Display. Left for consistency with
