@@ -1,3 +1,6 @@
+use crate::object::{ObjectEq, ObjectOrd, ObjectPartialEq, ObjectPartialOrd};
+use stainless_script_derive::{ObjectEq, ObjectOrd, ObjectPartialEq, ObjectPartialOrd};
+
 use super::NopNode;
 use crate::{
     class::Class,
@@ -14,7 +17,9 @@ pub fn any_class() -> Class {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(
+    Debug, Clone, PartialEq, PartialOrd, ObjectPartialEq, ObjectPartialOrd, ObjectEq, ObjectOrd,
+)]
 pub struct AnyType(String);
 
 impl FromStr for AnyType {
