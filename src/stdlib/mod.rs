@@ -17,6 +17,7 @@ mod variable_node;
 pub use any_type::*;
 pub use array_type::*;
 pub use bool_type::*;
+pub use dict_type::*;
 pub use flow_nodes::*;
 pub use if_node::*;
 pub use nop_node::*;
@@ -34,6 +35,7 @@ impl Plugin for StdPlugin {
             any_class(),
             array_class(),
             bool_class(),
+            dict_class(),
             start_node_class(),
             end_node_class(),
             if_node_class(),
