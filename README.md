@@ -12,7 +12,6 @@ Example programs are located in `example_programs` directory. Currently there ar
 
 # Planned features
 
-- Dictionaries
 - Program-defined objects
 
 # Executor
