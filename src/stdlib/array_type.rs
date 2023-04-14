@@ -18,7 +18,7 @@ pub fn array_class() -> Class {
 }
 
 #[derive(Debug, Clone, ObjectEq, ObjectOrd)]
-pub struct Array(Vec<Rc<dyn Object>>);
+pub struct Array(pub(crate) Vec<Rc<dyn Object>>);
 
 impl FromStr for Array {
     type Err = <AnyType as FromStr>::Err;

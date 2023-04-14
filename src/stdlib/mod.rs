@@ -4,6 +4,7 @@ use std::collections::HashMap;
 mod any_type;
 mod array_type;
 mod bool_type;
+mod dict_type;
 mod flow_nodes;
 mod if_node;
 mod nop_node;
