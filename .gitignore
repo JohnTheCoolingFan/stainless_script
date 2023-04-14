@@ -1,2 +1,4 @@
 /target
 /Cargo.lock
+/stainless_script_derive/target
+/stainless_script_derive/Cargo.lock
