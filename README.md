@@ -1,3 +1,5 @@
+[![crates.io](https://img.shields.io/crates/v/stainless_script)](https://crates.io/crates/stainless_script) [![crates.io](https://img.shields.io/crates/d/stainless_script)](https://crates.io/crates/stainless_script)
+
 # Stainless Script
 
 Stainless Script is a visual node-based programming language.
