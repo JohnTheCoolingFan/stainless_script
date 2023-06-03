@@ -4,7 +4,7 @@ use std::{collections::HashMap, fmt::Display, rc::Rc, str::FromStr};
 use thiserror::Error;
 
 /// Path in the module
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ModulePath(pub Vec<String>, pub String);
 
 impl Display for ModulePath {

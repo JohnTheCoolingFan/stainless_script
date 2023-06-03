@@ -20,7 +20,7 @@ use thiserror::Error;
 pub type NodeId = u32;
 
 /// An ID to point to a node in other program
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize)]
 pub struct AbsoluteNodeId(pub ProgramId, pub NodeId);
 
 impl Display for AbsoluteNodeId {
