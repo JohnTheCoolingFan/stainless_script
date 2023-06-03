@@ -11,6 +11,9 @@ authors = ["Jonh The Cooling Fan <ivan8215145640@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+members = ["stainless_script_derive"]
+
 [features]
 default = ["executor-binary", "format-json", "format-bincode"]
 executor-binary = ["clap", "glob"]
