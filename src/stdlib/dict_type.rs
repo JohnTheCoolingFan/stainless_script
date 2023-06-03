@@ -41,9 +41,8 @@ impl DictVal {
         )
     }
 
-    fn array_from_seq(seq: &Vec<ron::Value>) -> Array {
-        let seq = seq.clone();
-        Array(seq.into_iter().map(|v| DictVal::from_ron(&v).0).collect())
+    fn array_from_seq(seq: &[ron::Value]) -> Array {
+        Array(seq.iter().map(|v| DictVal::from_ron(v).0).collect())
     }
 }
 
@@ -132,7 +131,7 @@ impl Display for Dict {
             "{{{}}}",
             self.0
                 .iter()
-                .map(|(k, v)| format!("{}: {}", k.to_string(), v.to_string()))
+                .map(|(k, v)| format!("{}: {}", **k, **v))
                 .collect::<Vec<String>>()
                 .join(", ")
         )
